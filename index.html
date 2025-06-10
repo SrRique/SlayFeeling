@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Game System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-board">    
+
+        <!-- Enemy area -->
+        <div class="enemy-area">
+            <div class="enemy">👾</div>
+            <div class="enemy-health">HP: <span id="enemy-hp">50</span></div>
+        </div>
+
+        <!-- Game area-->
+        <div class="play-area"></div>
+
+        <!-- Energy display-->
+        <div class="energy-display">
+            Energy: <span id="current-energy">3</span>/3
+        </div>
+
+        <!-- Player hand -->
+        <div class="hand" id="hand"></div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
