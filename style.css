@@ -113,11 +113,10 @@ body {
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateY(-50%) translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateY(-50%) translateX(-5px); }
-    20%, 40%, 60%, 80% { transform: translateY(-50%) translateX(5px); }
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
-
 /* Ajustar área de jogo para ficar entre os personagens */
 .play-area {
     position: absolute;
@@ -128,7 +127,7 @@ body {
     height: 150px;
     border: 3px dashed #533483;
     border-radius: 20px;
-    opacity: 0.3;
+    opacity: 0;
     transition: all 0.3s ease;
 }
 
@@ -419,12 +418,12 @@ body {
     top: 50%;
     transform: translateY(-50%);
     text-align: center;
-    transition: all 0.2s;
+    transition: filter 0.2s; /* Apenas transição no filter */
 }
 
 .enemy-area:hover {
     filter: brightness(1.1);
-    transform: translateY(-50%) scale(1.05);
+    /* REMOVER: transform: translateY(-50%) scale(1.05); */
 }
 
 body.targeting-mode .enemy-area {
@@ -559,7 +558,80 @@ body.targeting-mode .enemy-area {
 
 /* Carta em modo targeting */
 .card.targeting {
-    transition: none !important;
+    transition: all 0.3s ease-out !important;
+    filter: brightness(1.2) drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+    box-shadow: 0 0 30px rgba(255, 102, 102, 0.8);
+    z-index: 999 !important;
+}
+
+/* Em vez disso, escurecer elementos específicos */
+body.targeting-mode .game-board {
+    position: relative;
+}
+
+/* Escurecer apenas elementos que não são importantes durante targeting */
+body.targeting-mode .deck-pile,
+body.targeting-mode .discard-pile,
+body.targeting-mode .energy-display,
+body.targeting-mode .end-turn-btn {
+    opacity: 0.5;
+    filter: brightness(0.5);
+}
+
+/* Player também fica mais escuro durante targeting de ataque */
+body.targeting-mode .player-area {
+    opacity: 0.7;
+    filter: brightness(0.7);
+}
+
+/* Carta em modo targeting fica acima do overlay */
+.card.targeting {
+    transition: all 0.3s ease-out !important;
     filter: brightness(1.2);
-    box-shadow: 0 0 20px rgba(255, 102, 102, 0.8);
+    box-shadow: 0 0 30px rgba(255, 102, 102, 0.8);
+    z-index: 999 !important;
+}
+
+/* Durante targeting, destacar o inimigo */
+body.targeting-mode .enemy-area {
+    z-index: 999;
+    position: relative;
+    animation: targetPulse 1s infinite;
+}
+
+/* Ajustar z-index dos elementos de targeting */
+.targeting-line {
+    z-index: 1001 !important;
+}
+
+.targeting-cursor {
+    z-index: 1002 !important;
+}
+
+body.targeting-mode .hand .card:not(.targeting) {
+    opacity: 0.5;
+    filter: brightness(0.7);
+}
+
+body.targeting-mode .enemy-area {
+    position: relative;
+    z-index: 999;
+    filter: brightness(1.2);
+}
+
+/* Animação de pulse sem alterar posição */
+body.targeting-mode .enemy-area .character-sprite {
+    animation: targetPulse 1s infinite;
+}
+
+@keyframes targetPulse {
+    0% { 
+        filter: drop-shadow(0 0 10px rgba(255, 102, 102, 0.8));
+    }
+    50% { 
+        filter: drop-shadow(0 0 25px rgba(255, 102, 102, 1));
+    }
+    100% { 
+        filter: drop-shadow(0 0 10px rgba(255, 102, 102, 0.8));
+    }
 }

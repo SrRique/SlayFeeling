@@ -409,17 +409,22 @@ function soltarCarta(e) {
     const manipulationArea = window.innerHeight - 250;
     const cardData = cartaArrastando.cardData;
     
+    console.log('Soltando carta em Y:', e.clientY, 'Limite:', manipulationArea);
+    
     // Se está acima da área de manipulação
     if (e.clientY < manipulationArea) {
         // Verificar tipo da carta
         if (cardData.type === 'damage') {
+            console.log('Iniciando targeting para carta de dano');
             // Carta de dano - iniciar targeting
             startTargeting(cartaArrastando, e);
         } else if (cardData.type === 'block') {
+            console.log('Jogando carta de defesa');
             // Carta de defesa - aplicar imediatamente
             playCard(cartaArrastando);
         }
     } else {
+        console.log('Voltando carta para a mão');
         // Está na área de manipulação - voltar para a mão
         cartaArrastando.classList.remove('dragging');
         returnCardToHand(cartaArrastando);
@@ -434,28 +439,66 @@ function soltarCarta(e) {
 function startTargeting(card, e) {
     isTargeting = true;
     targetingCard = card;
-    
-    // Posicionar a carta onde foi solta
-    const rect = card.getBoundingClientRect();
-    cardStartPosition = {
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2
-    };
+    targetingCard.targetStartTime = e.timeStamp;
     
     // Adicionar classe de targeting
     card.classList.add('targeting');
     card.classList.remove('dragging');
     
-    // Mostrar linha e cursor
-    document.getElementById('targeting-line').style.display = 'block';
-    document.getElementById('targeting-cursor').style.display = 'block';
+    // Calcular o centro da área das cartas na mão
+    const cards = document.querySelectorAll('.hand .card');
+    let leftMost = Infinity;
+    let rightMost = -Infinity;
     
-    // Adicionar listeners temporários
-    document.addEventListener('mousemove', updateTargeting);
-    document.addEventListener('click', confirmTarget);
-    document.addEventListener('keydown', cancelTargeting);
+    cards.forEach(c => {
+        const rect = c.getBoundingClientRect();
+        leftMost = Math.min(leftMost, rect.left);
+        rightMost = Math.max(rightMost, rect.right);
+    });
     
-    updateTargeting(e);
+    // Centro horizontal da mão
+    const handCenterX = (leftMost + rightMost) / 2 - 60; // 60 = metade da largura da carta
+    
+    // Posição Y um pouco elevada em relação às outras cartas
+    const baseBottom = parseInt(window.getComputedStyle(card).bottom) || 20;
+    const elevatedBottom = baseBottom + 100; // Elevar 100px acima das outras
+    
+    // Converter bottom para top para a animação
+    const windowHeight = window.innerHeight;
+    const cardHeight = 160; // altura da carta
+    const topPosition = windowHeight - elevatedBottom - cardHeight;
+    
+    // Mover carta para o centro da mão com destaque
+    card.style.transition = 'all 0.3s ease-out';
+    card.style.left = handCenterX + 'px';
+    card.style.top = topPosition + 'px';
+    card.style.bottom = 'auto';
+    card.style.transform = 'scale(1.3) rotate(0deg)';
+    card.style.zIndex = '1000';
+    
+    // Após a carta chegar à posição, mostrar targeting
+    setTimeout(() => {
+        // Atualizar posição de início da linha
+        const rect = card.getBoundingClientRect();
+        cardStartPosition = {
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2
+        };
+        
+        // Mostrar linha e cursor
+        document.getElementById('targeting-line').style.display = 'block';
+        document.getElementById('targeting-cursor').style.display = 'block';
+        
+        // Adicionar listeners temporários
+        document.addEventListener('mousemove', updateTargeting);
+        document.addEventListener('click', confirmTarget);
+        document.addEventListener('keydown', cancelTargeting);
+        
+        // Adicionar classe ao body para efeitos visuais
+        document.body.classList.add('targeting-mode');
+        
+        updateTargeting(e);
+    }, 300); // Esperar a animação da carta terminar
 }
 
 function updateTargeting(e) {
@@ -486,7 +529,12 @@ function updateTargeting(e) {
 }
 
 function confirmTarget(e) {
-    if (!isTargeting) return;
+    if (!isTargeting || !targetingCard) return; // Adicionar verificação extra
+    
+    // Prevenir que o clique inicial conte como confirmação
+    if (e.timeStamp - (targetingCard.targetStartTime || 0) < 100) {
+        return;
+    }
     
     // Verificar se clicou no inimigo
     const enemyArea = document.querySelector('.enemy-area');
@@ -523,6 +571,9 @@ function endTargeting() {
     // Esconder elementos
     document.getElementById('targeting-line').style.display = 'none';
     document.getElementById('targeting-cursor').style.display = 'none';
+    
+    // Remover classe do body
+    document.body.classList.remove('targeting-mode');
     
     // Remover listeners
     document.removeEventListener('mousemove', updateTargeting);
@@ -573,6 +624,7 @@ function playCard(cardElement) {
         
         // IMPORTANTE: Remover classes e estilos que podem interferir
         cardElement.classList.remove('dragging');
+        cardElement.classList.remove('targeting'); 
         cardElement.style.zIndex = '1000';
         
         // Primeiro, mover a carta para o centro por um momento
