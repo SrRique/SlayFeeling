@@ -71,6 +71,7 @@ class Enemy {
         this.name = name;
         this.maxHp = maxHp;
         this.currentHp = maxHp;
+        this.block = 0; // ADICIONAR
         this.nextAction = null;
         this.generateNextAction();
     }
@@ -110,13 +111,65 @@ class Enemy {
     }
     
     takeDamage(damage) {
-        this.currentHp = Math.max(0, this.currentHp - damage);
+        // ADICIONAR LÓGICA DE BLOCK
+        let actualDamage = damage;
+        
+        // Primeiro reduz do block
+        if (this.block > 0) {
+            const blocked = Math.min(this.block, damage);
+            this.block -= blocked;
+            actualDamage -= blocked;
+            
+            if (blocked > 0) {
+                showMessage(`Enemy blocked ${blocked} damage!`, 'block');
+            }
+        }
+        
+        // Aplicar dano restante
+        if (actualDamage > 0) {
+            this.currentHp = Math.max(0, this.currentHp - actualDamage);
+        }
+        
+        // Atualizar displays
+        this.updateDisplay();
+        
+        // Shake animation apenas se tomou dano real
+        if (actualDamage > 0) {
+            const enemyArea = document.querySelector('.enemy-area');
+            enemyArea.classList.add('shake');
+            setTimeout(() => enemyArea.classList.remove('shake'), 500);
+        }
+    }
+    
+    // NOVO MÉTODO
+    addBlock(amount) {
+        this.block += amount;
+        this.updateDisplay();
+    }
+    
+    // NOVO MÉTODO
+    startNewTurn() {
+        this.block = 0; // Block reseta no início do turno
+        this.updateDisplay();
+    }
+    
+    // NOVO MÉTODO
+    updateDisplay() {
+        // Atualizar HP
         document.getElementById('enemy-hp').textContent = this.currentHp;
         
-        // Shake animation
-        const enemyArea = document.querySelector('.enemy-area');
-        enemyArea.classList.add('shake');
-        setTimeout(() => enemyArea.classList.remove('shake'), 500);
+        // Atualizar barra de vida
+        const healthPercentage = (this.currentHp / this.maxHp) * 100;
+        document.getElementById('enemy-health-fill').style.width = healthPercentage + '%';
+        
+        // Atualizar block
+        const blockDisplay = document.getElementById('enemy-block-display');
+        if (this.block > 0) {
+            blockDisplay.classList.add('show');
+            document.getElementById('enemy-block').textContent = this.block;
+        } else {
+            blockDisplay.classList.remove('show');
+        }
     }
     
     executeAction() {
@@ -140,31 +193,37 @@ class Player {
     }
     
     takeDamage(damage) {
-        // Primeiro reduz do block
-        if (this.block > 0) {
-            const blocked = Math.min(this.block, damage);
-            this.block -= blocked;
-            damage -= blocked;
-            
-            if (blocked > 0) {
-                showMessage(`Blocked ${blocked} damage!`, 'block');
-            }
-        }
+    // Primeiro reduz do block
+    if (this.block > 0) {
+        const blocked = Math.min(this.block, damage);
+        this.block -= blocked;
+        damage -= blocked;
         
-        // Depois aplica dano restante
-        if (damage > 0) {
-            this.currentHp = Math.max(0, this.currentHp - damage);
-            showMessage(`Took ${damage} damage!`, 'damage');
+        if (blocked > 0) {
+            showMessage(`Blocked ${blocked} damage!`, 'block');
         }
+    }
+    
+    // Depois aplica dano restante
+    if (damage > 0) {
+        this.currentHp = Math.max(0, this.currentHp - damage);
+        showMessage(`Took ${damage} damage!`, 'damage');
         
-        this.updateDisplay();
-        
-        // Verificar derrota
-        if (this.currentHp <= 0) {
-            setTimeout(() => {
-                showMessage('Defeat... 💀', 'error');
-            }, 500);
-        }
+        // ADICIONAR SHAKE ANIMATION
+        const playerArea = document.querySelector('.player-area');
+        playerArea.classList.add('shake');
+        setTimeout(() => playerArea.classList.remove('shake'), 500);
+    }
+    
+    this.updateDisplay();
+    
+    // Verificar derrota
+    if (this.currentHp <= 0) {
+        setTimeout(() => {
+            showMessage('Defeat... 💀', 'error');
+            disableGame();
+        }, 500);
+    }
     }
     
     startNewTurn() {
@@ -172,22 +231,23 @@ class Player {
         this.updateDisplay();
     }
     
-    updateDisplay() {
-        // Vamos criar um display de HP do jogador
-        let playerDisplay = document.querySelector('.player-display');
-        if (!playerDisplay) {
-            playerDisplay = document.createElement('div');
-            playerDisplay.className = 'player-display';
-            playerDisplay.innerHTML = `
-                <div class="player-hp">HP: <span id="player-hp">${this.currentHp}</span>/${this.maxHp}</div>
-                <div class="player-block">🛡️ <span id="player-block">${this.block}</span></div>
-            `;
-            document.querySelector('.game-board').appendChild(playerDisplay);
-        } else {
-            document.getElementById('player-hp').textContent = this.currentHp;
-            document.getElementById('player-block').textContent = this.block;
-        }
+   updateDisplay() {
+    // Atualizar HP
+    document.getElementById('player-hp').textContent = this.currentHp;
+    
+    // Atualizar barra de vida
+    const healthPercentage = (this.currentHp / this.maxHp) * 100;
+    document.getElementById('player-health-fill').style.width = healthPercentage + '%';
+    
+    // Atualizar block
+    const blockDisplay = document.getElementById('player-block-display');
+    if (this.block > 0) {
+        blockDisplay.classList.add('show');
+        document.getElementById('player-block').textContent = this.block;
+    } else {
+        blockDisplay.classList.remove('show');
     }
+}
 }
 
 // ===== VARIÁVEIS GLOBAIS =====
@@ -201,6 +261,9 @@ let energyManager = null;
 let enemy = null;
 let player = null;
 let turnCount = 1;
+let isTargeting = false;
+let targetingCard = null;
+let cardStartPosition = { x: 0, y: 0 };
 
 // ===== FUNÇÕES DE GERENCIAMENTO DE CARTAS =====
 function addCardToHand(card, index = 0) {
@@ -319,7 +382,7 @@ function iniciarDrag(e) {
 }
 
 function arrastar(e) {
-    if (!cartaArrastando) return;
+    if (!cartaArrastando || isTargeting) return;
     
     // Calcular quanto mover desde a posição original
     const deltaX = e.clientX - offsetX - cartaArrastando.startX;
@@ -328,40 +391,145 @@ function arrastar(e) {
     // Usar transform para mover (preserva posição original)
     cartaArrastando.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(-5deg)`;
     
-    // Verificar se está sobre a área de jogo
-    const playArea = document.querySelector('.play-area');
-    const playRect = playArea.getBoundingClientRect();
+    // Verificar se está acima da área de manipulação
+    const manipulationArea = window.innerHeight - 250; // 250px é a altura da área
     
-    if (e.clientX > playRect.left && e.clientX < playRect.right &&
-        e.clientY > playRect.top && e.clientY < playRect.bottom) {
-        playArea.classList.add('hover');
+    if (e.clientY < manipulationArea) {
+        // Está fora da área de manipulação - pode usar a carta
+        document.body.style.cursor = 'crosshair';
     } else {
-        playArea.classList.remove('hover');
+        // Está dentro da área de manipulação
+        document.body.style.cursor = 'grab';
     }
 }
 
 function soltarCarta(e) {
     if (!cartaArrastando) return;
     
-    const playArea = document.querySelector('.play-area');
-    const playRect = playArea.getBoundingClientRect();
+    const manipulationArea = window.innerHeight - 250;
+    const cardData = cartaArrastando.cardData;
     
-    // Verificar se soltou na área de jogo
-    if (e.clientX > playRect.left && e.clientX < playRect.right &&
-        e.clientY > playRect.top && e.clientY < playRect.bottom) {
-        
-        // Tentar jogar a carta
-        playCard(cartaArrastando);
+    // Se está acima da área de manipulação
+    if (e.clientY < manipulationArea) {
+        // Verificar tipo da carta
+        if (cardData.type === 'damage') {
+            // Carta de dano - iniciar targeting
+            startTargeting(cartaArrastando, e);
+        } else if (cardData.type === 'block') {
+            // Carta de defesa - aplicar imediatamente
+            playCard(cartaArrastando);
+        }
     } else {
-        // Voltar para a mão com animação suave
+        // Está na área de manipulação - voltar para a mão
+        cartaArrastando.classList.remove('dragging');
         returnCardToHand(cartaArrastando);
     }
     
     // Limpar estados
-    cartaArrastando.classList.remove('dragging');
-    playArea.classList.remove('hover');
     cartaArrastando.style.zIndex = '';
     cartaArrastando = null;
+    document.body.style.cursor = 'default';
+}
+
+function startTargeting(card, e) {
+    isTargeting = true;
+    targetingCard = card;
+    
+    // Posicionar a carta onde foi solta
+    const rect = card.getBoundingClientRect();
+    cardStartPosition = {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+    };
+    
+    // Adicionar classe de targeting
+    card.classList.add('targeting');
+    card.classList.remove('dragging');
+    
+    // Mostrar linha e cursor
+    document.getElementById('targeting-line').style.display = 'block';
+    document.getElementById('targeting-cursor').style.display = 'block';
+    
+    // Adicionar listeners temporários
+    document.addEventListener('mousemove', updateTargeting);
+    document.addEventListener('click', confirmTarget);
+    document.addEventListener('keydown', cancelTargeting);
+    
+    updateTargeting(e);
+}
+
+function updateTargeting(e) {
+    if (!isTargeting) return;
+    
+    // Atualizar posição do cursor
+    const cursor = document.getElementById('targeting-cursor');
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+    
+    // Desenhar linha curva
+    const svg = document.querySelector('#targeting-line svg');
+    const path = document.getElementById('targeting-path');
+    
+    // Calcular pontos para curva de Bézier
+    const startX = cardStartPosition.x;
+    const startY = cardStartPosition.y;
+    const endX = e.clientX;
+    const endY = e.clientY;
+    
+    // Ponto de controle para a curva
+    const controlX = (startX + endX) / 2;
+    const controlY = Math.min(startY, endY) - 100; // Curva para cima
+    
+    // Criar path SVG
+    const pathData = `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
+    path.setAttribute('d', pathData);
+}
+
+function confirmTarget(e) {
+    if (!isTargeting) return;
+    
+    // Verificar se clicou no inimigo
+    const enemyArea = document.querySelector('.enemy-area');
+    const enemyRect = enemyArea.getBoundingClientRect();
+    
+    if (e.clientX > enemyRect.left && e.clientX < enemyRect.right &&
+        e.clientY > enemyRect.top && e.clientY < enemyRect.bottom) {
+        
+        // Acertou o inimigo - jogar a carta
+        playCard(targetingCard);
+    } else {
+        // Errou - voltar carta para a mão
+        targetingCard.classList.remove('targeting');
+        returnCardToHand(targetingCard);
+    }
+    
+    endTargeting();
+}
+
+function cancelTargeting(e) {
+    if (!isTargeting) return;
+    
+    if (e.key === 'Escape') {
+        targetingCard.classList.remove('targeting');
+        returnCardToHand(targetingCard);
+        endTargeting();
+    }
+}
+
+// Limpar targeting
+function endTargeting() {
+    isTargeting = false;
+    
+    // Esconder elementos
+    document.getElementById('targeting-line').style.display = 'none';
+    document.getElementById('targeting-cursor').style.display = 'none';
+    
+    // Remover listeners
+    document.removeEventListener('mousemove', updateTargeting);
+    document.removeEventListener('click', confirmTarget);
+    document.removeEventListener('keydown', cancelTargeting);
+    
+    targetingCard = null;
 }
 
 // ===== FUNÇÕES DE GAMEPLAY =====
@@ -651,6 +819,9 @@ function endTurn() {
     const endTurnBtn = document.getElementById('end-turn-btn');
     endTurnBtn.disabled = true;
     
+    // RESETAR BLOCK DO INIMIGO ANTES DA AÇÃO DELE
+    enemy.startNewTurn();
+    
     // Executar ação do inimigo
     setTimeout(() => {
         const enemyAction = enemy.executeAction();
@@ -659,8 +830,9 @@ function endTurn() {
             showMessage(`Enemy attacks for ${enemyAction.value}!`, 'damage');
             player.takeDamage(enemyAction.value);
         } else {
+            // Inimigo ganha block NOVO
             showMessage(`Enemy defends for ${enemyAction.value}!`, 'block');
-            // Inimigo ganha block (podemos implementar depois se quiser)
+            enemy.addBlock(enemyAction.value);
         }
         
         // Verificar se jogador morreu
@@ -681,13 +853,16 @@ function startNewTurn() {
     turnCount++;
     console.log('Starting turn', turnCount);
     
-    // Reset do jogador
+    // Reset do jogador (mantém)
     player.startNewTurn();
+    
+    // NÃO RESETAR O BLOCK DO INIMIGO AQUI
+    // enemy.startNewTurn(); // REMOVER ESTA LINHA
     
     // Recarregar energia
     energyManager.refillEnergy();
     
-    // MUDANÇA: Descartar mão antiga e comprar nova
+    // Descartar mão antiga e comprar nova
     discardHand();
     drawNewHand();
     

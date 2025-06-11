@@ -18,15 +18,118 @@ body {
     position: relative;
 }
 
-.play-area{
+/* Sprites dos personagens */
+.character-sprite {
+    font-size: 180px;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    transition: all 0.3s;
+}
+
+/* Container da barra de vida */
+.health-bar-container {
+    position: relative;
+    width: 150px;
+    margin: 0 auto;
+}
+
+/* Barra de vida */
+.health-bar {
+    width: 100%;
+    height: 20px;
+    background: #2a2a2a;
+    border: 2px solid #444;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Preenchimento da barra de vida */
+.health-fill {
+    height: 100%;
+    background: linear-gradient(to right, #ff4444, #ff6666);
+    transition: width 0.3s ease-out;
+    width: 100%;
+}
+
+.enemy-health-fill {
+    background: linear-gradient(to right, #ff4444, #ff6666);
+}
+
+/* Texto da vida */
+.health-text {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 400px;
-    height: 200px;
-    border: 3px dashed #666;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+/* Display de block/armadura */
+.block-display {
+    position: absolute;
+    bottom: -25px;
+    right: -10px;
+    background: #4dabf7;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    display: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.block-display.show {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.block-icon {
+    font-size: 12px;
+}
+
+/* Intent do inimigo (já existe mas vamos ajustar) */
+.enemy-intent {
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    background: #e94560;
+}
+
+/* Animação de shake (manter a existente) */
+.shake {
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateY(-50%) translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateY(-50%) translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateY(-50%) translateX(5px); }
+}
+
+/* Ajustar área de jogo para ficar entre os personagens */
+.play-area {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 150px;
+    border: 3px dashed #533483;
     border-radius: 20px;
+    opacity: 0.3;
+    transition: all 0.3s ease;
 }
 
 /* Cartas */
@@ -275,14 +378,12 @@ body {
 }
 
 /* Display do jogador */
-.player-display {
+.player-area {
     position: absolute;
-    bottom: 750px;
-    left: 20px;
-    background: #2d3561;
-    padding: 15px 25px;
-    border-radius: 15px;
-    border: 2px solid #4CAF50;
+    left: 300px;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
 }
 
 .player-hp {
@@ -310,22 +411,30 @@ body {
     font-size: 16px;
 }
 
-/* Shake animation para dano */
-.shake {
-    animation: shake 0.5s;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
 
 /* Área do inimigo melhorada */
 .enemy-area {
-    background: rgba(45, 53, 97, 0.5);
-    padding: 20px;
-    transition: all 0.3s;
+    position: absolute;
+    right: 300px;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.enemy-area:hover {
+    filter: brightness(1.1);
+    transform: translateY(-50%) scale(1.05);
+}
+
+body.targeting-mode .enemy-area {
+    animation: targetPulse 1s infinite;
+}
+
+@keyframes targetPulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 102, 102, 0.7); }
+    50% { box-shadow: 0 0 20px 10px rgba(255, 102, 102, 0.3); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 102, 102, 0.7); }
 }
 
 .enemy-health {
@@ -398,4 +507,59 @@ body {
 
 .pile-count.animated {
     animation: countChange 0.3s ease-out;
+}
+
+/* Área de manipulação de cartas (parte inferior) */
+.card-manipulation-area {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 250px;
+    /* Visual sutil para debug - remover depois se quiser */
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Linha de mira curva */
+.targeting-line {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+}
+
+.targeting-line svg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Cursor de mira */
+.targeting-cursor {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    border: 3px solid #ff6666;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    animation: pulse 1s infinite;
+    z-index: 1000;
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* Carta em modo targeting */
+.card.targeting {
+    transition: none !important;
+    filter: brightness(1.2);
+    box-shadow: 0 0 20px rgba(255, 102, 102, 0.8);
 }
