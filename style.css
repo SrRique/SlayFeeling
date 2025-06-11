@@ -241,3 +241,161 @@ body {
         opacity: 0; 
     }
 }
+
+/* Botão End Turn */
+.end-turn-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 120px;
+    padding: 15px 30px;
+    background: #e94560;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.end-turn-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+    background: #d63651;
+}
+
+.end-turn-btn:active {
+    transform: translateY(0);
+}
+
+.end-turn-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Display do jogador */
+.player-display {
+    position: absolute;
+    bottom: 750px;
+    left: 20px;
+    background: #2d3561;
+    padding: 15px 25px;
+    border-radius: 15px;
+    border: 2px solid #4CAF50;
+}
+
+.player-hp {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ff6b6b;
+}
+
+.player-block {
+    font-size: 18px;
+    color: #4dabf7;
+    margin-top: 5px;
+}
+
+/* Intent do inimigo */
+.enemy-intent {
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Shake animation para dano */
+.shake {
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Área do inimigo melhorada */
+.enemy-area {
+    background: rgba(45, 53, 97, 0.5);
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+.enemy-health {
+    background: #e94560;
+    padding: 8px 20px;
+    border-radius: 20px;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* Posicionar pilhas separadamente */
+.deck-pile {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(45, 53, 97, 0.9);
+    border: 2px solid #16c79a;
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    min-width: 80px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.discard-pile {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(45, 53, 97, 0.9);
+    border: 2px solid #e94560;
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    min-width: 80px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+/* Manter os estilos de hover e outros */
+.deck-pile:hover, .discard-pile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.pile-icon {
+    font-size: 32px;
+    margin-bottom: 5px;
+}
+
+.pile-count {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 5px;
+}
+
+.pile-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+/* Animação quando os números mudam */
+@keyframes countChange {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); color: #ffd700; }
+    100% { transform: scale(1); }
+}
+
+.pile-count.animated {
+    animation: countChange 0.3s ease-out;
+}

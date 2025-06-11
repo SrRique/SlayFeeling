@@ -23,8 +23,26 @@
             Energy: <span id="current-energy">3</span>/3
         </div>
 
+        <!-- Icones Deck e Discard -->
+    <div class="deck-container">
+    <div class="deck-pile">
+        <div class="pile-icon">📚</div>
+        <div class="pile-count" id="deck-count">10</div>
+        <div class="pile-label">Draw</div>
+    </div>
+    
+    <div class="discard-pile">
+        <div class="pile-icon">🗑️</div>
+        <div class="pile-count" id="discard-count">0</div>
+        <div class="pile-label">Discard</div>
+    </div>
+    </div>
+
         <!-- Player hand -->
         <div class="hand" id="hand"></div>
+
+        <!-- Adicione isso ANTES do </div> que fecha game-board -->
+        <button class="end-turn-btn" id="end-turn-btn">End Turn</button>        
     </div>
 
     <script src="script.js"></script>
