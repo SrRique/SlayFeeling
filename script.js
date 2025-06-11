@@ -559,7 +559,17 @@ function cancelTargeting(e) {
     
     if (e.key === 'Escape') {
         targetingCard.classList.remove('targeting');
-        returnCardToHand(targetingCard);
+        
+        // Resetar a posição para valores originais da mão
+        targetingCard.style.transition = 'all 0.3s ease-out';
+        targetingCard.style.top = 'auto';
+        targetingCard.style.bottom = '20px';
+        
+        // Reorganizar a mão para garantir posições corretas
+        setTimeout(() => {
+            reorganizeHand();
+        }, 50);
+        
         endTargeting();
     }
 }
@@ -585,20 +595,19 @@ function endTargeting() {
 
 // ===== FUNÇÕES DE GAMEPLAY =====
 function returnCardToHand(cardElement) {
-    // Aplicar transição
-    cardElement.style.transition = 'transform 0.3s ease-out';
+    // Remover classes que podem interferir
+    cardElement.classList.remove('targeting');
+    cardElement.classList.remove('dragging');
     
-    // Voltar ao transform original (que deve incluir a rotação do leque)
-    const cards = Array.from(document.querySelectorAll('.hand .card'));
-    const index = cards.indexOf(cardElement);
-    const rotation = (index - (cards.length - 1) / 2) * 3;
+    // Resetar para usar bottom em vez de top
+    cardElement.style.transition = 'all 0.3s ease-out';
+    cardElement.style.top = 'auto';
+    cardElement.style.bottom = '20px';
     
-    cardElement.style.transform = `rotate(${rotation}deg)`;
-    
-    // Limpar transição depois
+    // Reorganizar todas as cartas da mão
     setTimeout(() => {
-        cardElement.style.transition = '';
-    }, 300);
+        reorganizeHand();
+    }, 50);
 }
 
 function playCard(cardElement) {

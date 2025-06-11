@@ -112,10 +112,11 @@ body {
     animation: shake 0.5s;
 }
 
+/* Animação de shake corrigida para preservar o translateY */
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    20%, 40%, 60%, 80% { transform: translateX(5px); }
+    0%, 100% { transform: translateY(-50%) translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateY(-50%) translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateY(-50%) translateX(5px); }
 }
 /* Ajustar área de jogo para ficar entre os personagens */
 .play-area {
@@ -426,15 +427,6 @@ body {
     /* REMOVER: transform: translateY(-50%) scale(1.05); */
 }
 
-body.targeting-mode .enemy-area {
-    animation: targetPulse 1s infinite;
-}
-
-@keyframes targetPulse {
-    0% { box-shadow: 0 0 0 0 rgba(255, 102, 102, 0.7); }
-    50% { box-shadow: 0 0 20px 10px rgba(255, 102, 102, 0.3); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 102, 102, 0.7); }
-}
 
 .enemy-health {
     background: #e94560;
@@ -595,7 +587,11 @@ body.targeting-mode .player-area {
 /* Durante targeting, destacar o inimigo */
 body.targeting-mode .enemy-area {
     z-index: 999;
-    position: relative;
+    filter: brightness(1.2);
+}
+
+/* Animação de pulse sem alterar posição */
+body.targeting-mode .enemy-area .character-sprite {
     animation: targetPulse 1s infinite;
 }
 
@@ -613,16 +609,6 @@ body.targeting-mode .hand .card:not(.targeting) {
     filter: brightness(0.7);
 }
 
-body.targeting-mode .enemy-area {
-    position: relative;
-    z-index: 999;
-    filter: brightness(1.2);
-}
-
-/* Animação de pulse sem alterar posição */
-body.targeting-mode .enemy-area .character-sprite {
-    animation: targetPulse 1s infinite;
-}
 
 @keyframes targetPulse {
     0% { 
