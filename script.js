@@ -270,48 +270,51 @@ function addCardToHand(card, index = 0) {
     hand.push(card);
     const cardElement = card.createElement();
     
-    
-    // Pegar posição da pilha de compra
     const deckPile = document.querySelector('.deck-pile');
     const deckRect = deckPile.getBoundingClientRect();
     
-    // Calcular posição final na mão (antes de adicionar ao DOM)
     const handWidth = window.innerWidth;
-    const spacing = Math.min(150, handWidth / 5); // Assumindo 5 cartas
+    const spacing = Math.min(150, handWidth / 5);
     const totalWidth = 5 * spacing;
     const startX = (handWidth - totalWidth) / 2;
     const finalLeft = startX + (index * spacing);
     const finalBottom = 20;
     
-    // Começar a carta na pilha de compra (pequena e rotacionada)
+    // Posições para o rastro
+    const startPosX = deckRect.left + deckRect.width / 2;
+    const startPosY = deckRect.top + deckRect.height / 2;
+    const endPosX = finalLeft + 60; // 60 = metade da largura da carta
+    const endPosY = window.innerHeight - finalBottom - 80; // 80 = metade da altura
+    
+    // Criar rastro
+    createCardTrail(startPosX, startPosY, endPosX, endPosY, 'draw');
+    
+    // ... resto do código continua igual mas SEM rotate(720deg)
     cardElement.style.position = 'absolute';
-    cardElement.style.left = (deckRect.left + deckRect.width / 2 - 60) + 'px'; // 60 = metade da largura da carta
-    cardElement.style.top = (deckRect.top + deckRect.height / 2 - 80) + 'px'; // 80 = metade da altura da carta
-    cardElement.style.transform = 'scale(0.1) rotate(720deg)';
+    cardElement.style.left = (deckRect.left + deckRect.width / 2 - 60) + 'px';
+    cardElement.style.top = (deckRect.top + deckRect.height / 2 - 80) + 'px';
+    cardElement.style.transform = 'scale(0.1)';
     cardElement.style.opacity = '0';
     cardElement.style.zIndex = '100';
     cardElement.style.transition = 'none';
     
     document.getElementById('hand').appendChild(cardElement);
     
-    // Forçar reflow
     cardElement.offsetHeight;
     
-    // Animar para a posição final
     setTimeout(() => {
         cardElement.style.transition = 'all 0.4s ease-out';
         cardElement.style.left = finalLeft + 'px';
         cardElement.style.top = 'auto';
         cardElement.style.bottom = finalBottom + 'px';
-        cardElement.style.transform = `scale(1) rotate(${(index - 2) * 3}deg)`; // Rotação do leque
+        cardElement.style.transform = `scale(1) rotate(${(index - 2) * 3}deg)`;
         cardElement.style.opacity = '1';
         
-        // Limpar depois da animação
         setTimeout(() => {
             cardElement.style.transition = '';
             cardElement.style.zIndex = index;
         }, 400);
-    }, 50 + (index * 50)); // Delay baseado no índice para efeito cascata
+    }, 50 + (index * 50));
 }
 
 function reorganizeHand() {
@@ -395,8 +398,26 @@ function arrastar(e) {
     const manipulationArea = window.innerHeight - 250; // 250px é a altura da área
     
     if (e.clientY < manipulationArea) {
-        // Está fora da área de manipulação - pode usar a carta
-        document.body.style.cursor = 'crosshair';
+        // Cruzou a linha - verificar tipo da carta e iniciar ação
+        const cardData = cartaArrastando.cardData;
+        
+        if (cardData.type === 'damage') {
+            // Carta de dano - iniciar targeting imediatamente
+            console.log('Iniciando targeting automaticamente');
+            startTargeting(cartaArrastando, e);
+            
+            // Limpar referência para evitar problemas
+            cartaArrastando = null;
+            document.body.style.cursor = 'default';
+        } else if (cardData.type === 'block') {
+            // Carta de defesa - aplicar imediatamente
+            console.log('Aplicando defesa automaticamente');
+            playCard(cartaArrastando);
+            
+            // Limpar referência
+            cartaArrastando = null;
+            document.body.style.cursor = 'default';
+        }
     } else {
         // Está dentro da área de manipulação
         document.body.style.cursor = 'grab';
@@ -406,29 +427,11 @@ function arrastar(e) {
 function soltarCarta(e) {
     if (!cartaArrastando) return;
     
-    const manipulationArea = window.innerHeight - 250;
-    const cardData = cartaArrastando.cardData;
-    
-    console.log('Soltando carta em Y:', e.clientY, 'Limite:', manipulationArea);
-    
-    // Se está acima da área de manipulação
-    if (e.clientY < manipulationArea) {
-        // Verificar tipo da carta
-        if (cardData.type === 'damage') {
-            console.log('Iniciando targeting para carta de dano');
-            // Carta de dano - iniciar targeting
-            startTargeting(cartaArrastando, e);
-        } else if (cardData.type === 'block') {
-            console.log('Jogando carta de defesa');
-            // Carta de defesa - aplicar imediatamente
-            playCard(cartaArrastando);
-        }
-    } else {
-        console.log('Voltando carta para a mão');
-        // Está na área de manipulação - voltar para a mão
-        cartaArrastando.classList.remove('dragging');
-        returnCardToHand(cartaArrastando);
-    }
+    // Se chegou aqui, significa que não cruzou a linha
+    // Então apenas volta para a mão
+    console.log('Voltando carta para a mão');
+    cartaArrastando.classList.remove('dragging');
+    returnCardToHand(cartaArrastando);
     
     // Limpar estados
     cartaArrastando.style.zIndex = '';
@@ -795,41 +798,80 @@ function discardCard(cardData) {
     updateDeckCounters();
 }
 
+function createCardTrail(startX, startY, endX, endY, type = 'draw') {
+    const steps = 15; // Número de partículas no rastro
+    const trail = document.createElement('div');
+    trail.className = 'card-trail';
+    document.body.appendChild(trail);
+    
+    for (let i = 0; i < steps; i++) {
+        setTimeout(() => {
+            const progress = i / steps;
+            const x = startX + (endX - startX) * progress;
+            const y = startY + (endY - startY) * progress;
+            
+            const particle = document.createElement('div');
+            particle.className = `trail-particle ${type}`;
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            
+            // Adicionar variação aleatória
+            const randomX = (Math.random() - 0.5) * 10;
+            const randomY = (Math.random() - 0.5) * 10;
+            particle.style.transform = `translate(${randomX}px, ${randomY}px)`;
+            
+            trail.appendChild(particle);
+            
+            // Remover partícula após animação
+            setTimeout(() => particle.remove(), 800);
+        }, i * 20); // Delay entre partículas
+    }
+    
+    // Remover container após todas as partículas
+    setTimeout(() => trail.remove(), 1000);
+}
+
 function discardHand() {
-    // Guardar referência das cartas antes de limpar o array
     const cardsToDiscard = [...hand];
     const handElement = document.getElementById('hand');
     const cards = handElement.querySelectorAll('.card');
     
-    // Limpar array de mão imediatamente
     hand = [];
     
-    // Animar cartas indo para o descarte
     cards.forEach((card, index) => {
         setTimeout(() => {
             const discardIcon = document.querySelector('.discard-pile');
             const discardRect = discardIcon.getBoundingClientRect();
             const cardRect = card.getBoundingClientRect();
             
+            // Criar rastro de descarte
+            createCardTrail(
+                cardRect.left + cardRect.width / 2,
+                cardRect.top + cardRect.height / 2,
+                discardRect.left + discardRect.width / 2,
+                discardRect.top + discardRect.height / 2,
+                'discard'
+            );
+            
             const deltaX = discardRect.left + discardRect.width / 2 - cardRect.left - cardRect.width / 2;
             const deltaY = discardRect.top + discardRect.height / 2 - cardRect.top - cardRect.height / 2;
             
             card.style.transition = 'all 0.4s ease-in';
-            card.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.1) rotate(-720deg)`;
+            card.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.1) rotate(-360deg)`; // Mudei para -360 em vez de -720
             card.style.opacity = '0';
             card.style.zIndex = '100';
             
             setTimeout(() => {
                 card.remove();
             }, 400);
-        }, index * 50); // Pequeno delay entre cada carta
+        }, index * 50);
     });
     
-    // Adicionar cartas ao descarte após um delay
     setTimeout(() => {
         cardsToDiscard.forEach(cardData => discardCard(cardData));
     }, 200);
 }
+
 function animateReshuffle() {
     const deckPile = document.querySelector('.deck-pile');
     const discardPileElement = document.querySelector('.discard-pile');
@@ -989,3 +1031,4 @@ window.onload = () => {
         }
     });
 };
+

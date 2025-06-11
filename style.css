@@ -621,3 +621,66 @@ body.targeting-mode .hand .card:not(.targeting) {
         filter: drop-shadow(0 0 10px rgba(255, 102, 102, 0.8));
     }
 }
+
+/* Adicionar uma linha visual mais clara durante o drag (opcional) */
+.card.dragging ~ .card-manipulation-area {
+    border-top: 2px dashed rgba(255, 255, 255, 0.3);
+}
+
+/* Ou criar uma linha de "ativação" mais visível */
+.activation-line {
+    position: absolute;
+    bottom: 250px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.3) 20%, 
+        rgba(255, 255, 255, 0.3) 80%, 
+        transparent 100%);
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.card.dragging ~ .activation-line {
+    opacity: 1;
+}
+
+/* Rastro de luz para cartas */
+.card-trail {
+    position: absolute;
+    pointer-events: none;
+    z-index: 50;
+}
+
+.trail-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.8) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: trailFade 0.8s ease-out forwards;
+}
+
+@keyframes trailFade {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+}
+
+/* Cores diferentes para draw e discard */
+.trail-particle.draw {
+    background: radial-gradient(circle, rgba(22, 199, 154, 0.8) 0%, transparent 70%);
+}
+
+.trail-particle.discard {
+    background: radial-gradient(circle, rgba(233, 69, 96, 0.8) 0%, transparent 70%);
+}
