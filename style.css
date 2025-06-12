@@ -9,6 +9,10 @@ body {
     color: white;
     font-family: Arial, sans-serif;
     overflow: hidden;
+    user-select: none;  /* ADICIONE ESTA LINHA */
+    -webkit-user-select: none;  /* Para Safari */
+    -moz-user-select: none;     /* Para Firefox */
+    -ms-user-select: none;      /* Para IE/Edge */
 
 }
 
@@ -627,60 +631,79 @@ body.targeting-mode .hand .card:not(.targeting) {
     border-top: 2px dashed rgba(255, 255, 255, 0.3);
 }
 
-/* Ou criar uma linha de "ativação" mais visível */
-.activation-line {
+/* Animação de ataque */
+@keyframes attackForward {
+    0% { transform: translateY(-50%) translateX(0); }
+    30% { transform: translateY(-50%) translateX(50px); }
+    100% { transform: translateY(-50%) translateX(0); }
+}
+
+@keyframes attackBackward {
+    0% { transform: translateY(-50%) translateX(0); }
+    30% { transform: translateY(-50%) translateX(-50px); }
+    100% { transform: translateY(-50%) translateX(0); }
+}
+
+.player-area.attacking {
+    animation: attackForward 0.5s ease-out;
+}
+
+.enemy-area.attacking {
+    animation: attackBackward 0.5s ease-out;
+}
+
+/* Número de block ganho */
+.block-number {
     position: absolute;
-    bottom: 250px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(255, 255, 255, 0.3) 20%, 
-        rgba(255, 255, 255, 0.3) 80%, 
-        transparent 100%);
+    left: 50%;
+    top: 50%;
+    color: #4dabf7;
+    font-size: 36px;
+    font-weight: bold;
+    animation: blockFloat 1s forwards;
     pointer-events: none;
-    z-index: 10;
-    opacity: 0;
-    transition: opacity 0.3s;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
-.card.dragging ~ .activation-line {
-    opacity: 1;
-}
-
-/* Rastro de luz para cartas */
-.card-trail {
+/* Número de dano bloqueado */
+.blocked-number {
     position: absolute;
+    left: 50%;
+    top: 30%;
+    color: #ffd700;
+    font-size: 24px;
+    font-weight: bold;
+    animation: blockedFloat 1s forwards;
     pointer-events: none;
-    z-index: 50;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
-.trail-particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: radial-gradient(circle, rgba(255, 215, 0, 0.8) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: trailFade 0.8s ease-out forwards;
-}
-
-@keyframes trailFade {
-    0% {
-        opacity: 1;
-        transform: scale(1);
+@keyframes blockFloat {
+    0% { 
+        transform: translate(-50%, -50%) scale(0.5); 
+        opacity: 0; 
     }
-    100% {
-        opacity: 0;
-        transform: scale(0.3);
+    50% { 
+        transform: translate(-50%, -80px) scale(1.2); 
+        opacity: 1; 
+    }
+    100% { 
+        transform: translate(-50%, -120px) scale(0.9); 
+        opacity: 0; 
     }
 }
 
-/* Cores diferentes para draw e discard */
-.trail-particle.draw {
-    background: radial-gradient(circle, rgba(22, 199, 154, 0.8) 0%, transparent 70%);
-}
-
-.trail-particle.discard {
-    background: radial-gradient(circle, rgba(233, 69, 96, 0.8) 0%, transparent 70%);
+@keyframes blockedFloat {
+    0% { 
+        transform: translate(-50%, -50%) scale(0.8); 
+        opacity: 0; 
+    }
+    50% { 
+        transform: translate(-50%, -70px) scale(1); 
+        opacity: 1; 
+    }
+    100% { 
+        transform: translate(-50%, -100px) scale(0.8); 
+        opacity: 0; 
+    }
 }

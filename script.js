@@ -187,44 +187,44 @@ class Player {
         this.updateDisplay();
     }
     
+    
     addBlock(amount) {
         this.block += amount;
         this.updateDisplay();
     }
     
-    takeDamage(damage) {
+  takeDamage(damage) {
+    // ADICIONAR LÓGICA DE BLOCK
+    let actualDamage = damage;
+    
     // Primeiro reduz do block
     if (this.block > 0) {
         const blocked = Math.min(this.block, damage);
         this.block -= blocked;
-        damage -= blocked;
+        actualDamage -= blocked;
         
         if (blocked > 0) {
-            showMessage(`Blocked ${blocked} damage!`, 'block');
+            // REMOVIDO: showMessage(`Enemy blocked ${blocked} damage!`, 'block');
+            // Podemos adicionar um número visual de block se quiser
         }
     }
     
-    // Depois aplica dano restante
-    if (damage > 0) {
-        this.currentHp = Math.max(0, this.currentHp - damage);
-        showMessage(`Took ${damage} damage!`, 'damage');
-        
-        // ADICIONAR SHAKE ANIMATION
-        const playerArea = document.querySelector('.player-area');
-        playerArea.classList.add('shake');
-        setTimeout(() => playerArea.classList.remove('shake'), 500);
+    // Aplicar dano restante
+    if (actualDamage > 0) {
+        this.currentHp = Math.max(0, this.currentHp - actualDamage);
     }
     
+    // Atualizar displays
     this.updateDisplay();
     
-    // Verificar derrota
-    if (this.currentHp <= 0) {
-        setTimeout(() => {
-            showMessage('Defeat... 💀', 'error');
-            disableGame();
-        }, 500);
+    // Shake animation apenas se tomou dano real
+    if (actualDamage > 0) {
+        const enemyArea = document.querySelector('.enemy-area');
+        enemyArea.classList.add('shake');
+        setTimeout(() => enemyArea.classList.remove('shake'), 500);
     }
-    }
+}
+
     
     startNewTurn() {
         this.block = 0; // Block reseta no início do turno
@@ -250,6 +250,39 @@ class Player {
 }
 }
 
+// Mostrar dano no player
+function showPlayerDamageNumber(damage) {
+    const playerArea = document.querySelector('.player-area');
+    const damageDiv = document.createElement('div');
+    damageDiv.className = 'damage-number';
+    damageDiv.textContent = `-${damage}`;
+    playerArea.appendChild(damageDiv);
+    
+    setTimeout(() => damageDiv.remove(), 1000);
+}
+
+// Mostrar block ganho
+function showBlockNumber(amount) {
+    const playerArea = document.querySelector('.player-area');
+    const blockDiv = document.createElement('div');
+    blockDiv.className = 'block-number';
+    blockDiv.textContent = `+${amount}`;
+    playerArea.appendChild(blockDiv);
+    
+    setTimeout(() => blockDiv.remove(), 1000);
+}
+
+// Mostrar dano bloqueado
+function showBlockedNumber(blocked) {
+    const playerArea = document.querySelector('.player-area');
+    const blockedDiv = document.createElement('div');
+    blockedDiv.className = 'blocked-number';
+    blockedDiv.textContent = `Blocked ${blocked}`;
+    playerArea.appendChild(blockedDiv);
+    
+    setTimeout(() => blockedDiv.remove(), 1000);
+}
+
 // ===== VARIÁVEIS GLOBAIS =====
 let deck = []; // Pilha de compra
 let discardPile = []; // Pilha de descarte
@@ -270,26 +303,19 @@ function addCardToHand(card, index = 0) {
     hand.push(card);
     const cardElement = card.createElement();
     
+    // Pegar posição da pilha de compra
     const deckPile = document.querySelector('.deck-pile');
     const deckRect = deckPile.getBoundingClientRect();
     
+    // Calcular posição final na mão (antes de adicionar ao DOM)
     const handWidth = window.innerWidth;
-    const spacing = Math.min(150, handWidth / 5);
+    const spacing = Math.min(150, handWidth / 5); // Assumindo 5 cartas
     const totalWidth = 5 * spacing;
     const startX = (handWidth - totalWidth) / 2;
     const finalLeft = startX + (index * spacing);
     const finalBottom = 20;
     
-    // Posições para o rastro
-    const startPosX = deckRect.left + deckRect.width / 2;
-    const startPosY = deckRect.top + deckRect.height / 2;
-    const endPosX = finalLeft + 60; // 60 = metade da largura da carta
-    const endPosY = window.innerHeight - finalBottom - 80; // 80 = metade da altura
-    
-    // Criar rastro
-    createCardTrail(startPosX, startPosY, endPosX, endPosY, 'draw');
-    
-    // ... resto do código continua igual mas SEM rotate(720deg)
+    // Começar a carta na pilha de compra (pequena e sem rotação)
     cardElement.style.position = 'absolute';
     cardElement.style.left = (deckRect.left + deckRect.width / 2 - 60) + 'px';
     cardElement.style.top = (deckRect.top + deckRect.height / 2 - 80) + 'px';
@@ -300,21 +326,24 @@ function addCardToHand(card, index = 0) {
     
     document.getElementById('hand').appendChild(cardElement);
     
+    // Forçar reflow
     cardElement.offsetHeight;
     
+    // Animar para a posição final
     setTimeout(() => {
         cardElement.style.transition = 'all 0.4s ease-out';
         cardElement.style.left = finalLeft + 'px';
         cardElement.style.top = 'auto';
         cardElement.style.bottom = finalBottom + 'px';
-        cardElement.style.transform = `scale(1) rotate(${(index - 2) * 3}deg)`;
+        cardElement.style.transform = `scale(1) rotate(${(index - 2) * 3}deg)`; // Rotação do leque
         cardElement.style.opacity = '1';
         
+        // Limpar depois da animação
         setTimeout(() => {
             cardElement.style.transition = '';
             cardElement.style.zIndex = index;
         }, 400);
-    }, 50 + (index * 50));
+    }, 50 + (index * 50)); // Delay baseado no índice para efeito cascata
 }
 
 function reorganizeHand() {
@@ -379,6 +408,7 @@ function iniciarDrag(e) {
     
     // Adicionar classe para visual de arraste
     card.classList.add('dragging');
+    document.body.classList.add('dragging-active'); // ADICIONAR ESTA LINHA
     
     // Usar transform para mover a carta (não alterar left/top)
     card.style.zIndex = 1000;
@@ -398,9 +428,9 @@ function arrastar(e) {
     const manipulationArea = window.innerHeight - 250; // 250px é a altura da área
     
     if (e.clientY < manipulationArea) {
-        // Cruzou a linha - verificar tipo da carta e iniciar ação
         const cardData = cartaArrastando.cardData;
         
+        // APENAS cartas de DANO iniciam targeting automaticamente
         if (cardData.type === 'damage') {
             // Carta de dano - iniciar targeting imediatamente
             console.log('Iniciando targeting automaticamente');
@@ -409,14 +439,11 @@ function arrastar(e) {
             // Limpar referência para evitar problemas
             cartaArrastando = null;
             document.body.style.cursor = 'default';
-        } else if (cardData.type === 'block') {
-            // Carta de defesa - aplicar imediatamente
-            console.log('Aplicando defesa automaticamente');
-            playCard(cartaArrastando);
-            
-            // Limpar referência
-            cartaArrastando = null;
-            document.body.style.cursor = 'default';
+        } 
+        // REMOVER o else if para cartas de block
+        // Cartas de defesa continuam sendo arrastadas normalmente
+        else {
+            document.body.style.cursor = 'crosshair';
         }
     } else {
         // Está dentro da área de manipulação
@@ -427,11 +454,19 @@ function arrastar(e) {
 function soltarCarta(e) {
     if (!cartaArrastando) return;
     
-    // Se chegou aqui, significa que não cruzou a linha
-    // Então apenas volta para a mão
-    console.log('Voltando carta para a mão');
-    cartaArrastando.classList.remove('dragging');
-    returnCardToHand(cartaArrastando);
+    const manipulationArea = window.innerHeight - 250;
+    const cardData = cartaArrastando.cardData;
+    
+    // Se está acima da área de manipulação E é uma carta de defesa
+    if (e.clientY < manipulationArea && cardData.type === 'block') {
+        console.log('Aplicando defesa ao soltar');
+        playCard(cartaArrastando);
+    } else {
+        // Se não, volta para a mão
+        console.log('Voltando carta para a mão');
+        cartaArrastando.classList.remove('dragging');
+        returnCardToHand(cartaArrastando);
+    }
     
     // Limpar estados
     cartaArrastando.style.zIndex = '';
@@ -634,46 +669,26 @@ function playCard(cardElement) {
     if (index > -1) {
         hand.splice(index, 1);
         
-        // IMPORTANTE: Remover classes e estilos que podem interferir
-        cardElement.classList.remove('dragging');
-        cardElement.classList.remove('targeting'); 
-        cardElement.style.zIndex = '1000';
-        
-        // Primeiro, mover a carta para o centro por um momento
-        const playArea = document.querySelector('.play-area');
-        const playRect = playArea.getBoundingClientRect();
-        const cardRect = cardElement.getBoundingClientRect();
-        
-        // Calcular centro da área de jogo
-        const centerX = playRect.left + playRect.width / 2 - cardRect.width / 2;
-        const centerY = playRect.top + playRect.height / 2 - cardRect.height / 2;
-        
-        // Animar para o centro primeiro
-        cardElement.style.transition = 'all 0.3s ease-out';
-        cardElement.style.left = centerX + 'px';
-        cardElement.style.top = centerY + 'px';
-        cardElement.style.transform = 'scale(1.2) rotate(0deg)';
-        
-        // Aplicar efeito da carta
+        // Aplicar efeito da carta IMEDIATAMENTE
         applyCardEffect(cardData);
         
-        // Depois de um momento, animar para o descarte
+        // Animar direto para o descarte da posição atual
+        const discardIcon = document.querySelector('.discard-pile');
+        const discardRect = discardIcon.getBoundingClientRect();
+        const cardRect = cardElement.getBoundingClientRect();
+        
+        const deltaX = discardRect.left + discardRect.width / 2 - cardRect.left - cardRect.width / 2;
+        const deltaY = discardRect.top + discardRect.height / 2 - cardRect.top - cardRect.height / 2;
+        
+        cardElement.style.transition = 'all 0.4s ease-in';
+        cardElement.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.1) rotate(360deg)`;
+        cardElement.style.opacity = '0';
+        cardElement.style.zIndex = '1000';
+        
         setTimeout(() => {
-            const discardIcon = document.querySelector('.discard-pile');
-            const discardRect = discardIcon.getBoundingClientRect();
-            
-            const deltaX = discardRect.left + discardRect.width / 2 - centerX - cardRect.width / 2;
-            const deltaY = discardRect.top + discardRect.height / 2 - centerY - cardRect.height / 2;
-            
-            cardElement.style.transition = 'all 0.4s ease-in';
-            cardElement.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.1) rotate(360deg)`;
-            cardElement.style.opacity = '0';
-            
-            setTimeout(() => {
-                cardElement.remove();
-                reorganizeHand();
-            }, 400);
-        }, 300); // Espera 300ms no centro antes de ir pro descarte
+            cardElement.remove();
+            reorganizeHand();
+        }, 400);
         
         // Adicionar ao descarte
         discardCard(cardData);
@@ -692,8 +707,29 @@ function showMessage(text, type = 'info') {
 
 function applyCardEffect(card) {
     if (card.type === 'damage') {
-        enemy.takeDamage(card.value);
-        showDamageNumber(card.value);
+        // Adicionar animação de ataque do player
+        const playerArea = document.querySelector('.player-area');
+        playerArea.classList.add('attacking');
+        setTimeout(() => playerArea.classList.remove('attacking'), 500);
+        
+        // Pequeno delay para sincronizar com a animação
+        setTimeout(() => {
+            // Calcular dano real ANTES de aplicar
+            let actualDamage = card.value;
+            if (enemy.block > 0) {
+                actualDamage = Math.max(0, card.value - enemy.block);
+            }
+            
+            enemy.takeDamage(card.value);
+            
+            // Mostrar apenas o dano real aplicado
+            if (actualDamage > 0) {
+                showDamageNumber(actualDamage);
+            } else {
+                // Se todo dano foi bloqueado, mostrar "Blocked!"
+                showBlockedEnemyNumber();
+            }
+        }, 150);
         
         // Verificar vitória
         if (enemy.currentHp <= 0) {
@@ -704,8 +740,18 @@ function applyCardEffect(card) {
         }
     } else if (card.type === 'block') {
         player.addBlock(card.value);
-        showMessage(`Gained ${card.value} block!`, 'block');
+        showBlockNumber(card.value);
     }
+}
+
+function showBlockedEnemyNumber() {
+    const enemyArea = document.querySelector('.enemy-area');
+    const blockedDiv = document.createElement('div');
+    blockedDiv.className = 'blocked-number';
+    blockedDiv.textContent = 'Blocked!';
+    enemyArea.appendChild(blockedDiv);
+    
+    setTimeout(() => blockedDiv.remove(), 1000);
 }
 
 function showDamageNumber(damage) {
@@ -798,75 +844,38 @@ function discardCard(cardData) {
     updateDeckCounters();
 }
 
-function createCardTrail(startX, startY, endX, endY, type = 'draw') {
-    const steps = 15; // Número de partículas no rastro
-    const trail = document.createElement('div');
-    trail.className = 'card-trail';
-    document.body.appendChild(trail);
-    
-    for (let i = 0; i < steps; i++) {
-        setTimeout(() => {
-            const progress = i / steps;
-            const x = startX + (endX - startX) * progress;
-            const y = startY + (endY - startY) * progress;
-            
-            const particle = document.createElement('div');
-            particle.className = `trail-particle ${type}`;
-            particle.style.left = x + 'px';
-            particle.style.top = y + 'px';
-            
-            // Adicionar variação aleatória
-            const randomX = (Math.random() - 0.5) * 10;
-            const randomY = (Math.random() - 0.5) * 10;
-            particle.style.transform = `translate(${randomX}px, ${randomY}px)`;
-            
-            trail.appendChild(particle);
-            
-            // Remover partícula após animação
-            setTimeout(() => particle.remove(), 800);
-        }, i * 20); // Delay entre partículas
-    }
-    
-    // Remover container após todas as partículas
-    setTimeout(() => trail.remove(), 1000);
-}
 
 function discardHand() {
+    // Guardar referência das cartas antes de limpar o array
     const cardsToDiscard = [...hand];
     const handElement = document.getElementById('hand');
     const cards = handElement.querySelectorAll('.card');
     
+    // Limpar array de mão imediatamente
     hand = [];
     
+    // Animar cartas indo para o descarte
     cards.forEach((card, index) => {
         setTimeout(() => {
             const discardIcon = document.querySelector('.discard-pile');
             const discardRect = discardIcon.getBoundingClientRect();
             const cardRect = card.getBoundingClientRect();
             
-            // Criar rastro de descarte
-            createCardTrail(
-                cardRect.left + cardRect.width / 2,
-                cardRect.top + cardRect.height / 2,
-                discardRect.left + discardRect.width / 2,
-                discardRect.top + discardRect.height / 2,
-                'discard'
-            );
-            
             const deltaX = discardRect.left + discardRect.width / 2 - cardRect.left - cardRect.width / 2;
             const deltaY = discardRect.top + discardRect.height / 2 - cardRect.top - cardRect.height / 2;
             
             card.style.transition = 'all 0.4s ease-in';
-            card.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.1) rotate(-360deg)`; // Mudei para -360 em vez de -720
+            card.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.1) rotate(-360deg)`;
             card.style.opacity = '0';
             card.style.zIndex = '100';
             
             setTimeout(() => {
                 card.remove();
             }, 400);
-        }, index * 50);
+        }, index * 50); // Pequeno delay entre cada carta
     });
     
+    // Adicionar cartas ao descarte após um delay
     setTimeout(() => {
         cardsToDiscard.forEach(cardData => discardCard(cardData));
     }, 200);
@@ -928,10 +937,36 @@ function endTurn() {
     // Executar ação do inimigo
     setTimeout(() => {
         const enemyAction = enemy.executeAction();
+
+        if (enemyAction.type === 'attack') {
+    // REMOVIDO: showMessage(`Enemy attacks for ${enemyAction.value}!`, 'damage');
+    
+    // Adicionar animação de ataque do inimigo
+    const enemyArea = document.querySelector('.enemy-area');
+    enemyArea.classList.add('attacking');
+    setTimeout(() => enemyArea.classList.remove('attacking'), 500);
+    
+    // Delay para sincronizar dano com animação
+    setTimeout(() => {
+        player.takeDamage(enemyAction.value);
+    }, 150);
+} else {
+    // REMOVIDO: showMessage(`Enemy defends for ${enemyAction.value}!`, 'block');
+    enemy.addBlock(enemyAction.value);
+}
         
         if (enemyAction.type === 'attack') {
             showMessage(`Enemy attacks for ${enemyAction.value}!`, 'damage');
-            player.takeDamage(enemyAction.value);
+            
+            // Adicionar animação de ataque do inimigo
+            const enemyArea = document.querySelector('.enemy-area');
+            enemyArea.classList.add('attacking');
+            setTimeout(() => enemyArea.classList.remove('attacking'), 500);
+            
+            // Delay para sincronizar dano com animação
+            setTimeout(() => {
+                player.takeDamage(enemyAction.value);
+            }, 150);
         } else {
             // Inimigo ganha block NOVO
             showMessage(`Enemy defends for ${enemyAction.value}!`, 'block');
