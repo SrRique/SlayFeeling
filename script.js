@@ -111,35 +111,36 @@ class Enemy {
     }
     
     takeDamage(damage) {
-        // ADICIONAR LÓGICA DE BLOCK
-        let actualDamage = damage;
+    // ADICIONAR LÓGICA DE BLOCK
+    let actualDamage = damage;
+    
+    // Primeiro reduz do block
+    if (this.block > 0) {
+        const blocked = Math.min(this.block, damage);
+        this.block -= blocked;
+        actualDamage -= blocked;
         
-        // Primeiro reduz do block
-        if (this.block > 0) {
-            const blocked = Math.min(this.block, damage);
-            this.block -= blocked;
-            actualDamage -= blocked;
-            
-            if (blocked > 0) {
-                showMessage(`Enemy blocked ${blocked} damage!`, 'block');
-            }
-        }
-        
-        // Aplicar dano restante
-        if (actualDamage > 0) {
-            this.currentHp = Math.max(0, this.currentHp - actualDamage);
-        }
-        
-        // Atualizar displays
-        this.updateDisplay();
-        
-        // Shake animation apenas se tomou dano real
-        if (actualDamage > 0) {
-            const enemyArea = document.querySelector('.enemy-area');
-            enemyArea.classList.add('shake');
-            setTimeout(() => enemyArea.classList.remove('shake'), 500);
-        }
+        // NÃO MOSTRAR MENSAGEM AQUI
+        // if (blocked > 0) {
+        //     showMessage(`Enemy blocked ${blocked} damage!`, 'block');
+        // }
     }
+    
+    // Aplicar dano restante
+    if (actualDamage > 0) {
+        this.currentHp = Math.max(0, this.currentHp - actualDamage);
+    }
+    
+    // Atualizar displays
+    this.updateDisplay();
+    
+    // Shake animation apenas se tomou dano real
+    if (actualDamage > 0) {
+        const enemyArea = document.querySelector('.enemy-area');
+        enemyArea.classList.add('shake');
+        setTimeout(() => enemyArea.classList.remove('shake'), 500);
+    }
+}
     
     // NOVO MÉTODO
     addBlock(amount) {
@@ -193,35 +194,35 @@ class Player {
         this.updateDisplay();
     }
     
-  takeDamage(damage) {
-    // ADICIONAR LÓGICA DE BLOCK
-    let actualDamage = damage;
-    
+takeDamage(damage) {
     // Primeiro reduz do block
     if (this.block > 0) {
         const blocked = Math.min(this.block, damage);
         this.block -= blocked;
-        actualDamage -= blocked;
+        damage -= blocked;
+    }
+    
+    // Depois aplica dano restante
+    if (damage > 0) {
+        this.currentHp = Math.max(0, this.currentHp - damage);
         
-        if (blocked > 0) {
-            // REMOVIDO: showMessage(`Enemy blocked ${blocked} damage!`, 'block');
-            // Podemos adicionar um número visual de block se quiser
-        }
+        // Mostrar número de dano no player
+        showPlayerDamageNumber(damage); // Mostrar apenas dano real
+        
+        // ADICIONAR SHAKE ANIMATION
+        const playerArea = document.querySelector('.player-area');
+        playerArea.classList.add('shake');
+        setTimeout(() => playerArea.classList.remove('shake'), 500);
     }
     
-    // Aplicar dano restante
-    if (actualDamage > 0) {
-        this.currentHp = Math.max(0, this.currentHp - actualDamage);
-    }
-    
-    // Atualizar displays
     this.updateDisplay();
     
-    // Shake animation apenas se tomou dano real
-    if (actualDamage > 0) {
-        const enemyArea = document.querySelector('.enemy-area');
-        enemyArea.classList.add('shake');
-        setTimeout(() => enemyArea.classList.remove('shake'), 500);
+    // Verificar derrota
+    if (this.currentHp <= 0) {
+        setTimeout(() => {
+            showMessage('Defeat... 💀', 'error');
+            disableGame();
+        }, 500);
     }
 }
 
@@ -714,21 +715,8 @@ function applyCardEffect(card) {
         
         // Pequeno delay para sincronizar com a animação
         setTimeout(() => {
-            // Calcular dano real ANTES de aplicar
-            let actualDamage = card.value;
-            if (enemy.block > 0) {
-                actualDamage = Math.max(0, card.value - enemy.block);
-            }
-            
             enemy.takeDamage(card.value);
-            
-            // Mostrar apenas o dano real aplicado
-            if (actualDamage > 0) {
-                showDamageNumber(actualDamage);
-            } else {
-                // Se todo dano foi bloqueado, mostrar "Blocked!"
-                showBlockedEnemyNumber();
-            }
+            showDamageNumber(card.value); // Mostrar dano total aplicado
         }, 150);
         
         // Verificar vitória
@@ -740,6 +728,7 @@ function applyCardEffect(card) {
         }
     } else if (card.type === 'block') {
         player.addBlock(card.value);
+        // Mostrar número de block no player
         showBlockNumber(card.value);
     }
 }
