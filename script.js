@@ -926,26 +926,10 @@ function endTurn() {
     // Executar ação do inimigo
     setTimeout(() => {
         const enemyAction = enemy.executeAction();
-
-        if (enemyAction.type === 'attack') {
-    // REMOVIDO: showMessage(`Enemy attacks for ${enemyAction.value}!`, 'damage');
-    
-    // Adicionar animação de ataque do inimigo
-    const enemyArea = document.querySelector('.enemy-area');
-    enemyArea.classList.add('attacking');
-    setTimeout(() => enemyArea.classList.remove('attacking'), 500);
-    
-    // Delay para sincronizar dano com animação
-    setTimeout(() => {
-        player.takeDamage(enemyAction.value);
-    }, 150);
-} else {
-    // REMOVIDO: showMessage(`Enemy defends for ${enemyAction.value}!`, 'block');
-    enemy.addBlock(enemyAction.value);
-}
         
         if (enemyAction.type === 'attack') {
-            showMessage(`Enemy attacks for ${enemyAction.value}!`, 'damage');
+            // REMOVER ESTA LINHA:
+            // showMessage(`Enemy attacks for ${enemyAction.value}!`, 'damage');
             
             // Adicionar animação de ataque do inimigo
             const enemyArea = document.querySelector('.enemy-area');
@@ -957,8 +941,8 @@ function endTurn() {
                 player.takeDamage(enemyAction.value);
             }, 150);
         } else {
-            // Inimigo ganha block NOVO
-            showMessage(`Enemy defends for ${enemyAction.value}!`, 'block');
+            // REMOVER ESTA LINHA TAMBÉM:
+            // showMessage(`Enemy defends for ${enemyAction.value}!`, 'block');
             enemy.addBlock(enemyAction.value);
         }
         
@@ -1018,6 +1002,21 @@ window.onload = () => {
     
     // Inicializar deck com 10 cartas específicas
     initializeDeck();
+
+    // No final da função window.onload, adicione:
+
+// Criar estrelas
+const starsContainer = document.querySelector('.stars');
+if (starsContainer) {
+    for (let i = 0; i < 50; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        starsContainer.appendChild(star);
+    }
+}
     
     // Comprar mão inicial de 5 cartas COM ANIMAÇÃO
     const initialCards = [];
@@ -1054,5 +1053,7 @@ window.onload = () => {
             showMessage('Discard pile is empty', 'info');
         }
     });
+
+    
 };
 

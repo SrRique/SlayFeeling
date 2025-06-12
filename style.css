@@ -241,12 +241,12 @@ body {
 .energy-display {
     position: absolute;
     bottom: 220px;
-    left: 50%;
+    left: 10%;
     transform: translateX(-50%);
     background: #2d3561;
     padding: 15px 30px;
     border-radius: 20px;
-    border: 2px solid #e94560;
+    border: 2px solid #e9d945;
     font-size: 20px;
     font-weight: bold;
 }
@@ -706,4 +706,125 @@ body.targeting-mode .hand .card:not(.targeting) {
         transform: translate(-50%, -100px) scale(0.8); 
         opacity: 0; 
     }
+}
+
+/* Cenário de fundo */
+.game-board {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    /* Gradiente de céu */
+    background: linear-gradient(to bottom, 
+        #0f0c29 0%,        /* Céu escuro no topo */
+        #302b63 40%,       /* Céu médio */
+        #24243e 70%,       /* Transição para o chão */
+        #1a1a2e 100%       /* Base escura */
+    );
+    overflow: hidden;
+}
+
+/* Chão */
+.ground {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 249px;
+    background: linear-gradient(to bottom,
+        #2d2d44 0%,
+        #1a1a2e 100%
+    );
+    border-top: 3px solid #3d3d5c;
+}
+
+/* Padrão de textura no chão */
+.ground::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 10px,
+            rgba(255, 255, 255, 0.03) 10px,
+            rgba(255, 255, 255, 0.03) 20px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 10px,
+            rgba(255, 255, 255, 0.02) 10px,
+            rgba(255, 255, 255, 0.02) 20px
+        );
+}
+
+/* Estrelas no céu */
+.stars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70%;
+    overflow: hidden;
+}
+
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 3s infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Nuvens */
+.cloud {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 100px;
+    opacity: 0.4;
+}
+
+.cloud::before,
+.cloud::after {
+    content: '';
+    position: absolute;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 100px;
+}
+
+.cloud1 {
+    width: 100px;
+    height: 40px;
+    top: 20%;
+    left: 20%;
+    animation: float 20s infinite;
+}
+
+.cloud1::before {
+    width: 50px;
+    height: 50px;
+    top: -25px;
+    left: 10px;
+}
+
+.cloud1::after {
+    width: 60px;
+    height: 40px;
+    top: -15px;
+    right: 10px;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(30px); }
 }
