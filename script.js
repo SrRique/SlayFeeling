@@ -10,18 +10,30 @@ class Card {
 
     // Método para criar o elemento HTML da carta
     createElement() {
-        const cardDiv = document.createElement('div');
-        cardDiv.className = 'card';
-        cardDiv.innerHTML = `
-            <div class="cost">${this.cost}</div>
-            <div class="name">${this.name}</div>
-            <div class="effect">${this.description}</div>
-        `;
-        
-        // Guardar referência à carta no elemento
-        cardDiv.cardData = this;
-        
-        return cardDiv;
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'card';
+    
+    // Determinar emoji baseado no nome
+    let emoji = '';
+    if (this.name === 'Strike') {
+        emoji = '🗡️';
+    } else if (this.name === 'Bash') {
+        emoji = '🪓';
+    } else if (this.name === 'Defend') {
+        emoji = '🛡️';
+    }
+    
+    cardDiv.innerHTML = `
+        <div class="cost">${this.cost}</div>
+        <div class="card-emoji">${emoji}</div>
+        <div class="name">${this.name}</div>
+        <div class="effect">${this.description}</div>
+    `;
+    
+    // Guardar referência à carta no elemento
+    cardDiv.cardData = this;
+    
+    return cardDiv;
     }
 }
 
@@ -716,19 +728,20 @@ function applyCardEffect(card) {
         // Pequeno delay para sincronizar com a animação
         setTimeout(() => {
             enemy.takeDamage(card.value);
-            showDamageNumber(card.value); // Mostrar dano total aplicado
+            showDamageNumber(card.value);
+            
+            // Verificar vitória APÓS um pequeno delay para garantir que o HP foi atualizado
+            setTimeout(() => {
+                if (enemy.currentHp <= 0) {
+                    showMessage('Victory! 🎉', 'victory');
+                    disableGame();
+                }
+            }, 100); // Pequeno delay para garantir atualização
+            
         }, 150);
         
-        // Verificar vitória
-        if (enemy.currentHp <= 0) {
-            setTimeout(() => {
-                showMessage('Victory! 🎉', 'victory');
-                disableGame();
-            }, 500);
-        }
     } else if (card.type === 'block') {
         player.addBlock(card.value);
-        // Mostrar número de block no player
         showBlockNumber(card.value);
     }
 }
@@ -762,7 +775,7 @@ function initializeDeck() {
         // 4 Defends (5 de armadura, custo 1)
         ...Array(4).fill().map(() => new Card('Defend', 1, 'block', 5, 'Gain 5 block')),
         // 1 Bash (8 de dano, custo 2)
-        new Card('Bash', 2, 'damage', 8, 'Deal 8 damage')
+        new Card('Bash', 2, 'damage', 15, 'Deal 15 damage')
     ];
     
     // Embaralhar deck
