@@ -7,89 +7,110 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Main game board container -->
     <div class="game-board">    
+        <!-- Container for animated stars in the background -->
         <div class="stars"></div>
-    <div class="cloud cloud1"></div>
-    <div class="ground"></div>
-
         
-<div class="card-manipulation-area"></div>
+        <!-- Floating cloud element for scenery animation -->
+        <div class="cloud cloud1"></div>
+        
+        <!-- Ground texture at the bottom of the screen -->
+        <div class="ground"></div>
 
+        <!-- Invisible area (250px from bottom) used to detect when cards are dragged above the hand -->
+        <div class="card-manipulation-area"></div>
 
-<div class="targeting-line" id="targeting-line" style="display: none;">
-    <svg>
-        <path id="targeting-path" stroke="#ff6666" stroke-width="3" fill="none" stroke-dasharray="5,5"/>
-    </svg>
-</div>
+        <!-- SVG line that appears when targeting with attack cards -->
+        <div class="targeting-line" id="targeting-line" style="display: none;">
+            <svg>
+                <!-- Curved path connecting card to cursor during targeting -->
+                <path id="targeting-path" stroke="#ff6666" stroke-width="3" fill="none" stroke-dasharray="5,5"/>
+            </svg>
+        </div>
 
+        <!-- Circular cursor indicator shown during targeting mode -->
+        <div class="targeting-cursor" id="targeting-cursor" style="display: none;"></div>
 
-<div class="targeting-cursor" id="targeting-cursor" style="display: none;"></div>
-
-    
-<div class="enemy-area">
-    <div class="enemy-intent">⚔️ 7</div>
-    <div class="character-sprite">🕷️</div>
-    <div class="health-bar-container">
-        <div class="health-bar enemy-health-bar">
-            <div class="health-fill enemy-health-fill" id="enemy-health-fill"></div>
-            <div class="health-text">
-                <span id="enemy-hp">50</span>/50
+        <!-- Enemy character area (positioned on the right) -->
+        <div class="enemy-area">
+            <!-- Shows enemy's next action intent (attack or defend) -->
+            <div class="enemy-intent">⚔️ 7</div>
+            
+            <!-- Enemy sprite emoji -->
+            <div class="character-sprite">🕷️</div>
+            
+            <!-- Enemy health bar container -->
+            <div class="health-bar-container">
+                <div class="health-bar enemy-health-bar">
+                    <div class="health-fill enemy-health-fill" id="enemy-health-fill"></div>
+                    <div class="health-text">
+                        <span id="enemy-hp">50</span>/50
+                    </div>
+                </div>
+                
+                <!-- Enemy block/armor display (hidden when 0) -->
+                <div class="block-display" id="enemy-block-display">
+                    <span class="block-icon">🛡️</span>
+                    <span id="enemy-block">0</span>
+                </div>
             </div>
         </div>
-        <div class="block-display" id="enemy-block-display">
-            <span class="block-icon">🛡️</span>
-            <span id="enemy-block">0</span>
-        </div>
-    </div>
-</div>
 
-<div class="player-area">
-    <div class="character-sprite">🧙‍♂️</div>
-    <div class="health-bar-container">
-        <div class="health-bar">
-            <div class="health-fill" id="player-health-fill"></div>
-            <div class="health-text">
-                <span id="player-hp">80</span>/80
-            </div> 
-        </div>
-        <div class="block-display" id="player-block-display">
-            <span class="block-icon">🛡️</span>
-            <span id="player-block">0</span>
-        </div>
-    </div>
-</div>      
+        <!-- Player character area (positioned on the left) -->
+        <div class="player-area">
+            <!-- Player sprite emoji -->
+            <div class="character-sprite">🧙‍♂️</div>
+            
+            <!-- Player health bar container -->
+            <div class="health-bar-container">
+                <div class="health-bar">
+                    <div class="health-fill" id="player-health-fill"></div>
+                    <div class="health-text">
+                        <span id="player-hp">80</span>/80
+                    </div> 
+                </div>
+                
+                <!-- Player block/armor display (hidden when 0) -->
+                <div class="block-display" id="player-block-display">
+                    <span class="block-icon">🛡️</span>
+                    <span id="player-block">0</span>
+                </div>
+            </div>
+        </div>      
 
-        
+        <!-- Central play area (unused in current implementation, was for drop zone) -->
         <div class="play-area"></div>
 
-        
+        <!-- Energy counter display -->
         <div class="energy-display">
             Energy: <span id="current-energy">3</span>/3
         </div>
 
-        
-    <div class="deck-container">
-    <div class="deck-pile">
-        <div class="pile-icon">📚</div>
-        <div class="pile-count" id="deck-count">10</div>
-        <div class="pile-label">Draw</div>
-    </div>
-    
-    <div class="discard-pile">
-        <div class="pile-icon">🗑️</div>
-        <div class="pile-count" id="discard-count">0</div>
-        <div class="pile-label">Discard</div>
-    </div>
-    </div>
+        <!-- Deck and discard pile container -->
+        <div class="deck-container">
+            <!-- Draw pile (left side) -->
+            <div class="deck-pile">
+                <div class="pile-icon">📚</div>
+                <div class="pile-count" id="deck-count">10</div>
+                <div class="pile-label">Draw</div>
+            </div>
+            
+            <!-- Discard pile (right side) -->
+            <div class="discard-pile">
+                <div class="pile-icon">🗑️</div>
+                <div class="pile-count" id="discard-count">0</div>
+                <div class="pile-label">Discard</div>
+            </div>
+        </div>
 
-        
+        <!-- Player's hand container where cards are displayed -->
         <div class="hand" id="hand"></div>
 
-        
+        <!-- End turn button -->
         <button class="end-turn-btn" id="end-turn-btn">End Turn</button>        
     </div>
 
     <script src="script.js"></script>
-
 </body>
 </html>

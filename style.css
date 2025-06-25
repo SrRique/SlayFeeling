@@ -1,28 +1,31 @@
+/* Global reset and base styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Main body styling with dark theme */
 body {
     background: #1a1a2e;
     color: white;
     font-family: Arial, sans-serif;
     overflow: hidden;
+    /* Disable text selection to prevent highlighting during drag operations */
     user-select: none;  
     -webkit-user-select: none;  
     -moz-user-select: none;     
     -ms-user-select: none;      
-
 }
 
-.game-board{
+/* Main game container */
+.game-board {
     width: 100vw;
     height: 100vh;
     position: relative;
 }
 
-
+/* Character sprite emoji styling */
 .character-sprite {
     font-size: 180px;
     margin-bottom: 10px;
@@ -30,14 +33,14 @@ body {
     transition: all 0.3s;
 }
 
-
+/* Health bar container positioning */
 .health-bar-container {
     position: relative;
     width: 150px;
     margin: 0 auto;
 }
 
-
+/* Health bar background */
 .health-bar {
     width: 100%;
     height: 20px;
@@ -48,7 +51,7 @@ body {
     position: relative;
 }
 
-
+/* Health bar fill (animated when taking damage) */
 .health-fill {
     height: 100%;
     background: linear-gradient(to right, #ff4444, #ff6666);
@@ -56,11 +59,12 @@ body {
     width: 100%;
 }
 
+/* Enemy health bar specific styling */
 .enemy-health-fill {
     background: linear-gradient(to right, #ff4444, #ff6666);
 }
 
-
+/* Health text overlay */
 .health-text {
     position: absolute;
     top: 50%;
@@ -72,7 +76,7 @@ body {
     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
-
+/* Block/armor display (appears when block > 0) */
 .block-display {
     position: absolute;
     bottom: -25px;
@@ -87,17 +91,19 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
+/* Show block display when active */
 .block-display.show {
     display: flex;
     align-items: center;
     gap: 3px;
 }
 
+/* Block shield icon */
 .block-icon {
     font-size: 12px;
 }
 
-
+/* Enemy intent indicator (shows next action) */
 .enemy-intent {
     position: absolute;
     top: -40px;
@@ -108,21 +114,22 @@ body {
     color: white;
     font-weight: bold;
     font-size: 16px;
-    background: #e94560;
+    background: #e94560; /* Red for attack, changes to blue for defend */
 }
 
-
+/* Shake animation class for damage feedback */
 .shake {
     animation: shake 0.5s;
 }
 
-
+/* Shake animation keyframes - maintains vertical centering */
 @keyframes shake {
     0%, 100% { transform: translateY(-50%) translateX(0); }
     10%, 30%, 50%, 70%, 90% { transform: translateY(-50%) translateX(-5px); }
     20%, 40%, 60%, 80% { transform: translateY(-50%) translateX(5px); }
 }
 
+/* Central play area (deprecated in current version) */
 .play-area {
     position: absolute;
     top: 50%;
@@ -136,7 +143,7 @@ body {
     transition: all 0.3s ease;
 }
 
-
+/* Base card styling */
 .card {
     width: 120px;
     height: 160px;
@@ -148,8 +155,25 @@ body {
     left: 50%;
     cursor: grab;
     padding: 10px;
+    transition: transform 0.2s, top 0.2s, left 0.3s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
+/* Card hover state */
+.card:hover {
+    transform: translateY(-20px) scale(1.05);
+    z-index: 100 !important;
+}
+
+/* Card dragging state */
+.card.dragging {
+    transition: none;
+    cursor: grabbing;
+    transform: rotate(-5deg) scale(1.1);
+    z-index: 1000 !important;
+}
+
+/* Energy cost circle */
 .card .cost {
     position: absolute;
     top: -10px;
@@ -164,38 +188,15 @@ body {
     font-weight: bold;
 }
 
-.card {
-    width: 120px;
-    height: 160px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: 2px solid gold;
-    border-radius: 8px;
-    position: absolute;
-    cursor: grab;
-    padding: 10px;
-    transition: transform 0.2s, top 0.2s, left 0.3s;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-}
-
-.card:hover {
-    transform: translateY(-20px) scale(1.05);
-    z-index: 100 !important;
-}
-
-.card.dragging {
-    transition: none;
-    cursor: grabbing;
-    transform: rotate(-5deg) scale(1.1);
-    z-index: 1000 !important;
-}
-
+/* Card name text */
 .card .name {
     text-align: center;
     font-weight: bold;
-    margin-top: 25px;
+    margin-top: 5px;
     font-size: 14px;
 }
 
+/* Card effect description */
 .card .effect {
     text-align: center;
     font-size: 11px;
@@ -205,18 +206,35 @@ body {
     right: 10px;
 }
 
-
-.play-area {
-    transition: all 0.3s;
+/* Card emoji icon */
+.card-emoji {
+    font-size: 48px;
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
+/* Unplayable card state (not enough energy) */
+.card.unplayable {
+    opacity: 0.5;
+    filter: grayscale(70%);
+    cursor: not-allowed;
+}
+
+/* Reduced hover effect for unplayable cards */
+.card.unplayable:hover {
+    transform: translateY(-5px) scale(1.02);
+}
+
+/* Play area hover state (unused) */
 .play-area.hover {
     border-color: #4CAF50;
     background: rgba(76, 175, 80, 0.1);
     box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
 }
 
-
+/* Card effect message animation (deprecated) */
 .card-effect-message {
     position: fixed;
     top: 50%;
@@ -230,6 +248,7 @@ body {
     animation: fadeInOut 2s forwards;
 }
 
+/* Fade in/out animation */
 @keyframes fadeInOut {
     0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
     20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
@@ -237,7 +256,7 @@ body {
     100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
 }
 
-
+/* Energy display panel */
 .energy-display {
     position: absolute;
     bottom: 220px;
@@ -251,23 +270,13 @@ body {
     font-weight: bold;
 }
 
+/* Current energy number styling */
 #current-energy {
     color: #4CAF50;
     font-size: 28px;
 }
 
-
-.card.unplayable {
-    opacity: 0.5;
-    filter: grayscale(70%);
-    cursor: not-allowed;
-}
-
-.card.unplayable:hover {
-    transform: translateY(-5px) scale(1.02);
-}
-
-
+/* Message popup styling */
 .message {
     position: fixed;
     top: 40%;
@@ -281,27 +290,32 @@ body {
     z-index: 2000;
 }
 
+/* Error message style */
 .message.error {
     background: #e94560;
     color: white;
 }
 
+/* Damage message style */
 .message.damage {
     background: #ff6b6b;
     color: white;
 }
 
+/* Block message style */
 .message.block {
     background: #4dabf7;
     color: white;
 }
 
+/* Victory message style */
 .message.victory {
     background: #51cf66;
     color: white;
     font-size: 32px;
 }
 
+/* Message slide animation */
 @keyframes messageSlide {
     0% { 
         opacity: 0; 
@@ -321,7 +335,7 @@ body {
     }
 }
 
-
+/* Floating damage numbers */
 .damage-number {
     position: absolute;
     left: 50%;
@@ -334,6 +348,7 @@ body {
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
+/* Damage number float animation */
 @keyframes damageFloat {
     0% { 
         transform: translate(-50%, -50%) scale(0.5); 
@@ -349,7 +364,7 @@ body {
     }
 }
 
-
+/* End turn button */
 .end-turn-btn {
     position: absolute;
     bottom: 20px;
@@ -366,22 +381,25 @@ body {
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
+/* End turn button hover */
 .end-turn-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(0,0,0,0.4);
     background: #d63651;
 }
 
+/* End turn button active */
 .end-turn-btn:active {
     transform: translateY(0);
 }
 
+/* End turn button disabled state */
 .end-turn-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-
+/* Player area positioning */
 .player-area {
     position: absolute;
     left: 300px;
@@ -390,49 +408,36 @@ body {
     text-align: center;
 }
 
+/* Player HP text (deprecated) */
 .player-hp {
     font-size: 20px;
     font-weight: bold;
     color: #ff6b6b;
 }
 
+/* Player block text (deprecated) */
 .player-block {
     font-size: 18px;
     color: #4dabf7;
     margin-top: 5px;
 }
 
-
-.enemy-intent {
-    position: absolute;
-    top: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 8px 16px;
-    border-radius: 8px;
-    color: white;
-    font-weight: bold;
-    font-size: 16px;
-}
-
-
-
+/* Enemy area positioning */
 .enemy-area {
     position: absolute;
     right: 300px;
     top: 50%;
     transform: translateY(-50%);
     text-align: center;
-    transition: filter 0.2s; 
-
+    transition: filter 0.2s;
 }
 
+/* Enemy hover effect */
 .enemy-area:hover {
     filter: brightness(1.1);
-    
 }
 
-
+/* Enemy health display (deprecated) */
 .enemy-health {
     background: #e94560;
     padding: 8px 20px;
@@ -441,7 +446,7 @@ body {
     font-weight: bold;
 }
 
-
+/* Draw pile styling */
 .deck-pile {
     position: absolute;
     bottom: 20px;
@@ -456,6 +461,7 @@ body {
     cursor: pointer;
 }
 
+/* Discard pile styling */
 .discard-pile {
     position: absolute;
     bottom: 20px;
@@ -470,17 +476,19 @@ body {
     cursor: pointer;
 }
 
-
+/* Deck/discard pile hover effect */
 .deck-pile:hover, .discard-pile:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
+/* Pile icon (emoji) */
 .pile-icon {
     font-size: 32px;
     margin-bottom: 5px;
 }
 
+/* Pile card count number */
 .pile-count {
     font-size: 24px;
     font-weight: bold;
@@ -488,43 +496,45 @@ body {
     margin-bottom: 5px;
 }
 
+/* Pile label text */
 .pile-label {
     font-size: 12px;
     text-transform: uppercase;
     opacity: 0.8;
 }
 
-
+/* Count change animation */
 @keyframes countChange {
     0% { transform: scale(1); }
     50% { transform: scale(1.2); color: #ffd700; }
     100% { transform: scale(1); }
 }
 
+/* Animated count class */
 .pile-count.animated {
     animation: countChange 0.3s ease-out;
 }
 
-
+/* Invisible manipulation area for drag detection */
 .card-manipulation-area {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     height: 250px;
-    
     border-top: 1px dashed rgba(255, 255, 255, 0.1);
     pointer-events: none;
     z-index: 1;
 }
 
-
+/* Targeting line container */
 .targeting-line {
     position: fixed;
     pointer-events: none;
     z-index: 999;
 }
 
+/* Targeting line SVG */
 .targeting-line svg {
     position: fixed;
     top: 0;
@@ -534,7 +544,7 @@ body {
     pointer-events: none;
 }
 
-
+/* Targeting cursor circle */
 .targeting-cursor {
     position: fixed;
     width: 60px;
@@ -547,13 +557,14 @@ body {
     z-index: 1000;
 }
 
+/* Pulse animation for targeting cursor */
 @keyframes pulse {
     0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
     50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; }
     100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
-
+/* Card in targeting mode */
 .card.targeting {
     transition: all 0.3s ease-out !important;
     filter: brightness(1.2) drop-shadow(0 10px 20px rgba(0,0,0,0.5));
@@ -561,12 +572,12 @@ body {
     z-index: 999 !important;
 }
 
-
+/* Body in targeting mode */
 body.targeting-mode .game-board {
     position: relative;
 }
 
-
+/* Dim UI elements during targeting */
 body.targeting-mode .deck-pile,
 body.targeting-mode .discard-pile,
 body.targeting-mode .energy-display,
@@ -575,32 +586,24 @@ body.targeting-mode .end-turn-btn {
     filter: brightness(0.5);
 }
 
-
+/* Dim player area during targeting */
 body.targeting-mode .player-area {
     opacity: 0.7;
     filter: brightness(0.7);
 }
 
-
-.card.targeting {
-    transition: all 0.3s ease-out !important;
-    filter: brightness(1.2);
-    box-shadow: 0 0 30px rgba(255, 102, 102, 0.8);
-    z-index: 999 !important;
-}
-
-
+/* Highlight enemy during targeting */
 body.targeting-mode .enemy-area {
     z-index: 999;
     filter: brightness(1.2);
 }
 
-
+/* Enemy pulse animation during targeting */
 body.targeting-mode .enemy-area .character-sprite {
     animation: targetPulse 1s infinite;
 }
 
-
+/* High z-index for targeting elements */
 .targeting-line {
     z-index: 1001 !important;
 }
@@ -609,12 +612,13 @@ body.targeting-mode .enemy-area .character-sprite {
     z-index: 1002 !important;
 }
 
+/* Dim non-targeting cards */
 body.targeting-mode .hand .card:not(.targeting) {
     opacity: 0.5;
     filter: brightness(0.7);
 }
 
-
+/* Target pulse animation */
 @keyframes targetPulse {
     0% { 
         filter: drop-shadow(0 0 10px rgba(255, 102, 102, 0.8));
@@ -627,24 +631,26 @@ body.targeting-mode .hand .card:not(.targeting) {
     }
 }
 
-
+/* Highlight manipulation area border when dragging */
 .card.dragging ~ .card-manipulation-area {
     border-top: 2px dashed rgba(255, 255, 255, 0.3);
 }
 
-
+/* Player attack animation (lunge forward) */
 @keyframes attackForward {
     0% { transform: translateY(-50%) translateX(0); }
     30% { transform: translateY(-50%) translateX(50px); }
     100% { transform: translateY(-50%) translateX(0); }
 }
 
+/* Enemy attack animation (lunge backward) */
 @keyframes attackBackward {
     0% { transform: translateY(-50%) translateX(0); }
     30% { transform: translateY(-50%) translateX(-50px); }
     100% { transform: translateY(-50%) translateX(0); }
 }
 
+/* Apply attack animations */
 .player-area.attacking {
     animation: attackForward 0.5s ease-out;
 }
@@ -653,7 +659,7 @@ body.targeting-mode .hand .card:not(.targeting) {
     animation: attackBackward 0.5s ease-out;
 }
 
-
+/* Block gain number display */
 .block-number {
     position: absolute;
     left: 50%;
@@ -666,7 +672,7 @@ body.targeting-mode .hand .card:not(.targeting) {
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
-
+/* Blocked damage indicator */
 .blocked-number {
     position: absolute;
     left: 50%;
@@ -679,6 +685,7 @@ body.targeting-mode .hand .card:not(.targeting) {
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
+/* Block number float animation */
 @keyframes blockFloat {
     0% { 
         transform: translate(-50%, -50%) scale(0.5); 
@@ -694,6 +701,7 @@ body.targeting-mode .hand .card:not(.targeting) {
     }
 }
 
+/* Blocked number float animation */
 @keyframes blockedFloat {
     0% { 
         transform: translate(-50%, -50%) scale(0.8); 
@@ -709,12 +717,12 @@ body.targeting-mode .hand .card:not(.targeting) {
     }
 }
 
-
+/* Game board with gradient sky background */
 .game-board {
     width: 100vw;
     height: 100vh;
     position: relative;
-    
+    /* Dark to purple gradient for night sky effect */
     background: linear-gradient(to bottom, 
         #0f0c29 0%,        
         #302b63 40%,       
@@ -724,13 +732,13 @@ body.targeting-mode .hand .card:not(.targeting) {
     overflow: hidden;
 }
 
-
+/* Ground texture at bottom */
 .ground {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 249px;
+    height: 249px; /* Just below the 250px manipulation area */
     background: linear-gradient(to bottom,
         #2d2d44 0%,
         #1a1a2e 100%
@@ -738,7 +746,7 @@ body.targeting-mode .hand .card:not(.targeting) {
     border-top: 3px solid #3d3d5c;
 }
 
-
+/* Grid texture overlay for ground */
 .ground::before {
     content: '';
     position: absolute;
@@ -746,6 +754,7 @@ body.targeting-mode .hand .card:not(.targeting) {
     left: 0;
     right: 0;
     bottom: 0;
+    /* Create subtle grid pattern */
     background-image: 
         repeating-linear-gradient(
             90deg,
@@ -763,7 +772,7 @@ body.targeting-mode .hand .card:not(.targeting) {
         );
 }
 
-
+/* Stars container */
 .stars {
     position: absolute;
     top: 0;
@@ -773,6 +782,7 @@ body.targeting-mode .hand .card:not(.targeting) {
     overflow: hidden;
 }
 
+/* Individual star styling */
 .star {
     position: absolute;
     width: 2px;
@@ -782,12 +792,13 @@ body.targeting-mode .hand .card:not(.targeting) {
     animation: twinkle 3s infinite;
 }
 
+/* Twinkle animation for stars */
 @keyframes twinkle {
     0%, 100% { opacity: 0.3; transform: scale(1); }
     50% { opacity: 1; transform: scale(1.2); }
 }
 
-
+/* Cloud base styling */
 .cloud {
     position: absolute;
     background: rgba(255, 255, 255, 0.05);
@@ -795,6 +806,7 @@ body.targeting-mode .hand .card:not(.targeting) {
     opacity: 0.4;
 }
 
+/* Cloud pseudo-elements for shape */
 .cloud::before,
 .cloud::after {
     content: '';
@@ -803,6 +815,7 @@ body.targeting-mode .hand .card:not(.targeting) {
     border-radius: 100px;
 }
 
+/* First cloud instance */
 .cloud1 {
     width: 100px;
     height: 40px;
@@ -811,6 +824,7 @@ body.targeting-mode .hand .card:not(.targeting) {
     animation: float 20s infinite;
 }
 
+/* Cloud shape details */
 .cloud1::before {
     width: 50px;
     height: 50px;
@@ -825,24 +839,8 @@ body.targeting-mode .hand .card:not(.targeting) {
     right: 10px;
 }
 
+/* Cloud floating animation */
 @keyframes float {
     0%, 100% { transform: translateX(0); }
     50% { transform: translateX(30px); }
-}
-
-
-.card-emoji {
-    font-size: 48px;
-    text-align: center;
-    margin-top: 15px;
-    margin-bottom: 5px;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-}
-
-
-.card .name {
-    text-align: center;
-    font-weight: bold;
-    margin-top: 5px; 
-    font-size: 14px;
 }
