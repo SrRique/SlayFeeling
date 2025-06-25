@@ -9,10 +9,10 @@ body {
     color: white;
     font-family: Arial, sans-serif;
     overflow: hidden;
-    user-select: none;  /* ADICIONE ESTA LINHA */
-    -webkit-user-select: none;  /* Para Safari */
-    -moz-user-select: none;     /* Para Firefox */
-    -ms-user-select: none;      /* Para IE/Edge */
+    user-select: none;  
+    -webkit-user-select: none;  
+    -moz-user-select: none;     
+    -ms-user-select: none;      
 
 }
 
@@ -22,7 +22,7 @@ body {
     position: relative;
 }
 
-/* Sprites dos personagens */
+
 .character-sprite {
     font-size: 180px;
     margin-bottom: 10px;
@@ -30,14 +30,14 @@ body {
     transition: all 0.3s;
 }
 
-/* Container da barra de vida */
+
 .health-bar-container {
     position: relative;
     width: 150px;
     margin: 0 auto;
 }
 
-/* Barra de vida */
+
 .health-bar {
     width: 100%;
     height: 20px;
@@ -48,7 +48,7 @@ body {
     position: relative;
 }
 
-/* Preenchimento da barra de vida */
+
 .health-fill {
     height: 100%;
     background: linear-gradient(to right, #ff4444, #ff6666);
@@ -60,7 +60,7 @@ body {
     background: linear-gradient(to right, #ff4444, #ff6666);
 }
 
-/* Texto da vida */
+
 .health-text {
     position: absolute;
     top: 50%;
@@ -72,7 +72,7 @@ body {
     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
-/* Display de block/armadura */
+
 .block-display {
     position: absolute;
     bottom: -25px;
@@ -97,7 +97,7 @@ body {
     font-size: 12px;
 }
 
-/* Intent do inimigo (já existe mas vamos ajustar) */
+
 .enemy-intent {
     position: absolute;
     top: -40px;
@@ -111,18 +111,18 @@ body {
     background: #e94560;
 }
 
-/* Animação de shake (manter a existente) */
+
 .shake {
     animation: shake 0.5s;
 }
 
-/* Animação de shake corrigida para preservar o translateY */
+
 @keyframes shake {
     0%, 100% { transform: translateY(-50%) translateX(0); }
     10%, 30%, 50%, 70%, 90% { transform: translateY(-50%) translateX(-5px); }
     20%, 40%, 60%, 80% { transform: translateY(-50%) translateX(5px); }
 }
-/* Ajustar área de jogo para ficar entre os personagens */
+
 .play-area {
     position: absolute;
     top: 50%;
@@ -136,7 +136,7 @@ body {
     transition: all 0.3s ease;
 }
 
-/* Cartas */
+
 .card {
     width: 120px;
     height: 160px;
@@ -205,7 +205,7 @@ body {
     right: 10px;
 }
 
-/* Área de jogo com hover */
+
 .play-area {
     transition: all 0.3s;
 }
@@ -216,7 +216,7 @@ body {
     box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
 }
 
-/* Mensagem de efeito */
+
 .card-effect-message {
     position: fixed;
     top: 50%;
@@ -237,7 +237,7 @@ body {
     100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
 }
 
-/* Display de energia */
+
 .energy-display {
     position: absolute;
     bottom: 220px;
@@ -256,7 +256,7 @@ body {
     font-size: 28px;
 }
 
-/* Cartas sem energia */
+
 .card.unplayable {
     opacity: 0.5;
     filter: grayscale(70%);
@@ -267,7 +267,7 @@ body {
     transform: translateY(-5px) scale(1.02);
 }
 
-/* Mensagens melhoradas */
+
 .message {
     position: fixed;
     top: 40%;
@@ -321,7 +321,7 @@ body {
     }
 }
 
-/* Número de dano */
+
 .damage-number {
     position: absolute;
     left: 50%;
@@ -349,7 +349,7 @@ body {
     }
 }
 
-/* Botão End Turn */
+
 .end-turn-btn {
     position: absolute;
     bottom: 20px;
@@ -381,7 +381,7 @@ body {
     cursor: not-allowed;
 }
 
-/* Display do jogador */
+
 .player-area {
     position: absolute;
     left: 300px;
@@ -402,7 +402,7 @@ body {
     margin-top: 5px;
 }
 
-/* Intent do inimigo */
+
 .enemy-intent {
     position: absolute;
     top: -40px;
@@ -416,19 +416,20 @@ body {
 }
 
 
-/* Área do inimigo melhorada */
+
 .enemy-area {
     position: absolute;
     right: 300px;
     top: 50%;
     transform: translateY(-50%);
     text-align: center;
-    transition: filter 0.2s; /* Apenas transição no filter */
+    transition: filter 0.2s; 
+
 }
 
 .enemy-area:hover {
     filter: brightness(1.1);
-    /* REMOVER: transform: translateY(-50%) scale(1.05); */
+    
 }
 
 
@@ -440,7 +441,7 @@ body {
     font-weight: bold;
 }
 
-/* Posicionar pilhas separadamente */
+
 .deck-pile {
     position: absolute;
     bottom: 20px;
@@ -469,7 +470,7 @@ body {
     cursor: pointer;
 }
 
-/* Manter os estilos de hover e outros */
+
 .deck-pile:hover, .discard-pile:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
@@ -493,7 +494,7 @@ body {
     opacity: 0.8;
 }
 
-/* Animação quando os números mudam */
+
 @keyframes countChange {
     0% { transform: scale(1); }
     50% { transform: scale(1.2); color: #ffd700; }
@@ -504,20 +505,20 @@ body {
     animation: countChange 0.3s ease-out;
 }
 
-/* Área de manipulação de cartas (parte inferior) */
+
 .card-manipulation-area {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     height: 250px;
-    /* Visual sutil para debug - remover depois se quiser */
+    
     border-top: 1px dashed rgba(255, 255, 255, 0.1);
     pointer-events: none;
     z-index: 1;
 }
 
-/* Linha de mira curva */
+
 .targeting-line {
     position: fixed;
     pointer-events: none;
@@ -533,7 +534,7 @@ body {
     pointer-events: none;
 }
 
-/* Cursor de mira */
+
 .targeting-cursor {
     position: fixed;
     width: 60px;
@@ -552,7 +553,7 @@ body {
     100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
-/* Carta em modo targeting */
+
 .card.targeting {
     transition: all 0.3s ease-out !important;
     filter: brightness(1.2) drop-shadow(0 10px 20px rgba(0,0,0,0.5));
@@ -560,12 +561,12 @@ body {
     z-index: 999 !important;
 }
 
-/* Em vez disso, escurecer elementos específicos */
+
 body.targeting-mode .game-board {
     position: relative;
 }
 
-/* Escurecer apenas elementos que não são importantes durante targeting */
+
 body.targeting-mode .deck-pile,
 body.targeting-mode .discard-pile,
 body.targeting-mode .energy-display,
@@ -574,13 +575,13 @@ body.targeting-mode .end-turn-btn {
     filter: brightness(0.5);
 }
 
-/* Player também fica mais escuro durante targeting de ataque */
+
 body.targeting-mode .player-area {
     opacity: 0.7;
     filter: brightness(0.7);
 }
 
-/* Carta em modo targeting fica acima do overlay */
+
 .card.targeting {
     transition: all 0.3s ease-out !important;
     filter: brightness(1.2);
@@ -588,18 +589,18 @@ body.targeting-mode .player-area {
     z-index: 999 !important;
 }
 
-/* Durante targeting, destacar o inimigo */
+
 body.targeting-mode .enemy-area {
     z-index: 999;
     filter: brightness(1.2);
 }
 
-/* Animação de pulse sem alterar posição */
+
 body.targeting-mode .enemy-area .character-sprite {
     animation: targetPulse 1s infinite;
 }
 
-/* Ajustar z-index dos elementos de targeting */
+
 .targeting-line {
     z-index: 1001 !important;
 }
@@ -626,12 +627,12 @@ body.targeting-mode .hand .card:not(.targeting) {
     }
 }
 
-/* Adicionar uma linha visual mais clara durante o drag (opcional) */
+
 .card.dragging ~ .card-manipulation-area {
     border-top: 2px dashed rgba(255, 255, 255, 0.3);
 }
 
-/* Animação de ataque */
+
 @keyframes attackForward {
     0% { transform: translateY(-50%) translateX(0); }
     30% { transform: translateY(-50%) translateX(50px); }
@@ -652,7 +653,7 @@ body.targeting-mode .hand .card:not(.targeting) {
     animation: attackBackward 0.5s ease-out;
 }
 
-/* Número de block ganho */
+
 .block-number {
     position: absolute;
     left: 50%;
@@ -665,7 +666,7 @@ body.targeting-mode .hand .card:not(.targeting) {
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
-/* Número de dano bloqueado */
+
 .blocked-number {
     position: absolute;
     left: 50%;
@@ -708,22 +709,22 @@ body.targeting-mode .hand .card:not(.targeting) {
     }
 }
 
-/* Cenário de fundo */
+
 .game-board {
     width: 100vw;
     height: 100vh;
     position: relative;
-    /* Gradiente de céu */
+    
     background: linear-gradient(to bottom, 
-        #0f0c29 0%,        /* Céu escuro no topo */
-        #302b63 40%,       /* Céu médio */
-        #24243e 70%,       /* Transição para o chão */
-        #1a1a2e 100%       /* Base escura */
+        #0f0c29 0%,        
+        #302b63 40%,       
+        #24243e 70%,       
+        #1a1a2e 100%       
     );
     overflow: hidden;
 }
 
-/* Chão */
+
 .ground {
     position: absolute;
     bottom: 0;
@@ -737,7 +738,7 @@ body.targeting-mode .hand .card:not(.targeting) {
     border-top: 3px solid #3d3d5c;
 }
 
-/* Padrão de textura no chão */
+
 .ground::before {
     content: '';
     position: absolute;
@@ -762,7 +763,7 @@ body.targeting-mode .hand .card:not(.targeting) {
         );
 }
 
-/* Estrelas no céu */
+
 .stars {
     position: absolute;
     top: 0;
@@ -786,7 +787,7 @@ body.targeting-mode .hand .card:not(.targeting) {
     50% { opacity: 1; transform: scale(1.2); }
 }
 
-/* Nuvens */
+
 .cloud {
     position: absolute;
     background: rgba(255, 255, 255, 0.05);
@@ -829,7 +830,7 @@ body.targeting-mode .hand .card:not(.targeting) {
     50% { transform: translateX(30px); }
 }
 
-/* Emoji da carta */
+
 .card-emoji {
     font-size: 48px;
     text-align: center;
@@ -838,10 +839,10 @@ body.targeting-mode .hand .card:not(.targeting) {
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
-/* Ajustar o nome para ficar melhor com o emoji */
+
 .card .name {
     text-align: center;
     font-weight: bold;
-    margin-top: 5px; /* Reduzido de 25px */
+    margin-top: 5px; 
     font-size: 14px;
 }
